@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>jTopo Demo</title>
+
+    <link rel="stylesheet" type="text/css" href="../../Content/base.css">
+    <link rel="stylesheet" href="../../Content/bootstrap.css">
+    <link href="../../Content/jquery.snippet.min.css" rel="stylesheet">
+    <style>
+        canvas {
+            width: 100%;
+        }
+
+        .jtopo_toolbar {
+            width: 100%;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <!-- <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#home" data-toggle="tab">
+                wcs监控
+            </a>
+        </li>
+        <li>
+            <a href="#serverMonitor" data-toggle="tab">服务端监控</a>
+        </li>
+        <li>
+            <a href="#locationMonitor" data-toggle="tab">货位监控</a>
+        </li>
+        <li class="dropdown">
+            <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown">
+                配置工具
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+                <li>
+                    <a href="#div_config" tabindex="-1" data-toggle="tab">系统配置</a>
+                </li>
+                <li>
+                    <a href="#div_help" tabindex="-1" data-toggle="tab">帮助文档</a>
+                </li>
+            </ul>
+        </li>
+    </ul> -->
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="home">
+            <div class="wrap_div">
+                <div class="content">
+                    <div class="right">
+                        <div id="content">
+                            <canvas id="canvas"></canvas>
+                            <div class="snippet-container" style="margin-top:3px;;">
+                                <div class="sh_acid snippet-wrap" style="display: none;">
+                                    <div class="snippet-menu sh_sourceCode" style="display:none;">
+                                        <pre><a class="snippet-copy sh_url" href="#" style="display: none;">copy</a><a class="snippet-text sh_url" href="#">text</a><a class="snippet-window sh_url" href="#">pop-up</a></pre>
+                                    </div>
+                                    <div class="sh_sourceCode snippet-hide">
+                                        <pre><a href="#" class="snippet-revealed snippet-toggle sh_url">Collapse Code</a></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 点击右键站台时，弹出的列表内容 ul是无序列表*@ -->
+                <ul id="contextmenu" style="display:none;">
+                    <li>
+                        <a>修改信息</a>
+                    </li>
+                    <li>
+                        <a>一键清除</a>
+                    </li>
+                    <li>
+                        <a>一键申请</a>
+                    </li>
+                    <li>
+                        <a>正常排出</a>
+                    </li>
+                    <li>
+                        <a>异常排出</a>
+                    </li>
+                </ul>
+                <ul id="logindiv" style="display:none;">
+                    <li>
+                        <a>用户名</a>
+                        <input id="loginName" class="form-control" />
+                    </li>
+                    <li>
+                        <a>密码</a>
+                        <input id="passWord" class="form-control" />
+                    </li>
+                    <li>
+                        <button id="login_okText" class="btn btn-primary">确定</button>
+                        <button id="login_cancelText" class="btn btn-default">取消</button>
+                    </li>
+                </ul>
+                <ul id="equipmentinfo" style="display:none;">
+                    <li>
+                        <span id="span0">1：</span>
+                    </li>
+                    <li>
+                        <span id="span1">任务号：</span>
+                    </li>
+                    <li>
+                        <span id="span2">货物类型：</span>
+                    </li>
+                    <li>
+                        <span id="span3">托盘条码：</span>
+                    </li>
+                    <li>
+                        <span id="span4">起始地址：</span>
+                    </li>
+                    <li>
+                        <span id="span5">目标地址：</span>
+                    </li>
+                    <li>
+                        <span id="span6">外形检测：</span>
+                    </li>
+                </ul>
+                <ul id="UpdateInfo" style="display:none;">
+                    <li>站台号
+                        <input id="sta_station" class="form-control" />
+                    </li>
+                    <li> 任务号
+                        <input id="sta_taskno" class="form-control" />
+                    </li>
+                    <li>货物类型
+                        <input id="sta_goodtype" class="form-control" />
+                    </li>
+                    <li>托盘条码
+                        <input id="sta_barcode" class="form-control" />
+                    </li>
+                    <li>起始地址
+                        <input id="sta_from" class="form-control" />
+                    </li>
+                    <li>目标地址
+                        <input id="sta_to" class="form-control" />
+                    </li>
+                    <li>
+                        <button id="write_okText" class="btn btn-primary">确定</button>
+                        <button id="write_cancelText" class="btn btn-default">取消</button>
+                        <span id="tcMsg" style="color: red; ">提示消息</span>
+                    </li>
+                </ul>
+                <ul id="equipmentinfoSC" style="display:none;">
+                    <li>
+                        <span id="span0">本机模式：</span>
+                    </li>
+                    ''
+                    <li>
+                        <span id="span1">wcs模式：</span>
+                    </li>
+                    <li>
+                        <span id="span2">任务号：</span>
+                    </li>
+                    <li>
+                        <span id="span3">起始地址：</span>
+                    </li>
+                    <li>
+                        <span id="span4">目标地址：</span>
+                    </li>
+                    <li>
+                        <span id="span5">当前行：</span>
+                    </li>
+                    <li>
+                        <span id="span6">当前列：</span>
+                    </li>
+                    <li>
+                        <span id="span7">当前层：</span>
+                    </li>
+                    <li>
+                        <span id="span8">当前层：</span>
+                    </li>
+                </ul>
+
+            </div>
+
+
+
+        </div>
+        <!-- <div class="tab-pane fade" id="serverMonitor">
+            <canvas id="canvasServer" style="background-color: rgb(238, 238, 238); border: 1px solid rgb(68, 68, 68); cursor: default;"></canvas>
+            <div class="snippet-container" style="margin-top:3px;;">
+                <div class="sh_acid snippet-wrap" style="display: none;">
+                    <div class="snippet-menu sh_sourceCode" style="display:none;">
+                        <pre><a class="snippet-copy sh_url" href="#" style="display: none;">copy</a><a class="snippet-text sh_url" href="#">text</a><a class="snippet-window sh_url" href="#">pop-up</a></pre>
+                    </div>
+
+                    <pre class="snippet-textonly sh_sourceCode" style="display:none;">					
+	                            </pre>
+                    <div class="sh_sourceCode snippet-hide">
+                        <pre><a href="#" class="snippet-revealed snippet-toggle sh_url">Collapse Code</a></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="locationMonitor">
+            <p>
+                显示货位监控
+            </p>
+        </div>
+        <div class="tab-pane fade" id="div_config">
+            <p>配置界面</p>
+        </div>
+        <div class="tab-pane fade" id="div_help">
+            <p>
+                帮助页面
+            </p>
+        </div> -->
+    </div>
+    <script type="text/javascript" src="../../Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../../Scripts/jtopo-0.4.8-min.js"></script>
+    <script type="text/javascript" src="../../Scripts/toolbar.js"></script>
+    <script id='code' src="../../Scripts/DrapJtopo.js"></script>
+</body>
+
+</html>

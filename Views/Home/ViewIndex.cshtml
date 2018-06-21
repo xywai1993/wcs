@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <style>
+        #logindiv {
+            display: none;
+            padding: 20px;
+            top: 200px;
+            left: 50%;
+            position: fixed;
+            width: 300px;
+            background: rgb(255, 255, 255);
+            border-radius: 3px;
+            z-index: 9999;
+            border: 1px solid #eee;
+        }
+
+        #funcBtndiv {
+            display: none;
+            padding: 20px;
+            top: 200px;
+            left: 50%;
+            position: fixed;
+            width: 300px;
+            height: 410px;
+            background: rgb(255, 255, 255);
+            border-radius: 3px;
+            z-index: 9999;
+            border: 1px solid #eee;
+        }
+
+        /*#sc_message {
+            width: 300px;
+            height: 500px;
+            background: rgb(255, 255, 255);
+            border-radius: 3px;
+            border: 1px solid #eee;
+        }*/
+
+        .divcss5 {
+            width: 400px;
+            padding: 10px;
+            border: 1px solid #F00;
+        }
+
+        .divcss5_left {
+            float: left;
+            width: 150px;
+            border: 1px solid #00F;
+            height: 50px;
+        }
+
+        .divcss5_right {
+            float: right;
+            width: 150px;
+            border: 1px solid #00F;
+            height: 50px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        #heartdiv #tc_task p span {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+
+        #heartdiv #sc_message p span {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+
+        #heartdiv #robot_message p span {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+
+        #heartdiv #tc_button p span {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+        /*#heartdiv #sc_button p span {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }*/
+        #heartdiv #robot_button p span {
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+
+
+
+        #heartdiv #staBtn_deleteInfo p span {
+            width: 100px;
+            height: 35px;
+            background: url(../Content/img/btnbg.png) no-repeat center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 3px;
+            behavior: url(../Scripts/pie.htc);
+        }
+    </style>
+</head>
+
+
+<body>
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active">
+            <a href="#home" data-toggle="tab">
+                wcs监控
+            </a>
+        </li>
+        <li><a href="#ios" data-toggle="tab">服务端监控</a></li>
+        <li class="dropdown">
+            <a href="#" id="myTabDrop1" class="dropdown-toggle"
+               data-toggle="dropdown">
+                配置工具
+                <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+                <li><a href="#div_config" tabindex="-1" data-toggle="tab">系统配置</a></li>
+                <li><a href="#div_help" tabindex="-1" data-toggle="tab">帮助文档</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="home">
+            <!--<p>菜鸟教程是一个提供最新的web技术站点，本站免费提供了建站相关的技术文档，帮助广大web技术爱好者快速入门并建立自己的网站。菜鸟先飞早入行——学的不仅是技术，更是梦想。</p>-->
+
+
+            <div id="bigdiv">
+                <div id="topdiv">
+                    <div id="heartdiv" style="float: left; height: 600px; width: 230px; border: 1px solid #F00; overflow: scroll; display:none;">
+                        设备运行信息
+                        <div id="tc_task" style="width:300px;height:620px;background:#ccc;">
+                            <p><span>站台号：</span><input id="stationText" style="z-index:10;background:#c1bbbb;border:none;outline:none" readonly='readonly' placeholder="Text to task" /></p>
+                            <p><span>任务号：</span><input id="taskText" style="z-index:10;background:#c1bbbb;border:none;outline:none" placeholder="请输入任务号" /></p>
+                            <p><span>起始地址：</span><input id="fromText" style="z-index:10;background:#c1bbbb;border:none;outline:none" placeholder="请输入起始地址" /></p>
+                            <p><span>目标地址：</span><input id="toText" style="z-index:10;background:#c1bbbb;border:none;outline:none" placeholder="请输入目标地址" /></p>
+                            <p><span>货物类型：</span><input id="goodsText" style="z-index:10;background:#c1bbbb;border:none;outline:none" placeholder="请输入货物类型" /></p>
+                            <p><span>托盘条码：</span><input id="barcodeText" style="z-index:10;background:#c1bbbb;border:none;outline:none" placeholder="请输入托盘条码" /></p>
+                            <p><span>尾盘标记：</span><input id="lastOne" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <p><span>NG类型：</span><input id="NGType" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <p><span>是否旋转：</span><input id="needRoate" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <p><span>是否有货：</span><input id="load" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <p><span>OCV：</span><input id="finOCV" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <p><span>交互类型：</span><input id="interactiveType" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <p><span>条码检测：</span><input id="codeCheckFalut" style="z-index:10;background:#c1bbbb;border:none;outline:none" /></p>
+                            <span>软件故障：</span><textarea id="softerror" style="z-index:10;background:#c1bbbb;border:none;outline:none" cols="28" rows="2"></textarea>
+                            <span>设备故障：</span><textarea id="equipmenterror" style="z-index:10;background:#c1bbbb;border:none;outline:none" cols="28" rows="2"></textarea>
+                            <p>
+                                <button id="okText" class="btn btn-primary">确定</button>
+                                <button id="cancelText" class="btn btn-default">取消</button>
+                                <button id="test" class="btn btn-primary">测试</button>
+                            </p>
+                        </div>
+                        <div id="tc_button" style="width:300px;height:250px;background:#ccc;">
+                            <p>
+                                <button id="staBtn_deleteInfo" value="清除信息" class="btn btn-primary">清除信息</button>
+                                <button id="staBtn_moveInfo" value="移动信息" class="btn btn-primary">移动信息</button>
+                            </p>
+                            <p>
+                                <button id="staBtn_softErrorUrl" value="软件链接" class="btn btn-primary">软件链接</button>
+                                <button id="staBtn_equipErrorUrl" value="维修经验" class="btn btn-primary">维修经验</button>
+                            </p>
+                            <p>
+                                <button id="staBtn_okRemove" value="正常排出" class="btn btn-primary">正常排出</button>
+                                <button id="staBtn_errorRemove" value="异常排出" class="btn btn-primary">异常排出</button>
+                            </p>
+                            <p>
+                                <button id="staBtn_repeatIn" value="复测入库" class="btn btn-primary">复测入库</button>
+                                <button id="staBtn_okIn" value="正常入库" class="btn btn-primary">正常入库</button>
+                            </p>
+                            <p>
+                                <button id="staBtn_emptyIn" value="空盘入库" class="btn btn-primary">空盘入库</button>
+                                <button id="staBtn_fullIn" value="实盘入库" class="btn btn-primary">实盘入库</button>
+                            </p>
+                            <p>
+                                <button id="staBtn_mesInterface" value="调mes接口" class="btn btn-primary">调mes接口</button>
+                                @*<button id="staBtn_lastone" style="width: 100px; height: 30px; background: #808080; display: none;">收尾盘</button>*@
+                                <button id="staBtn_lastone" value="收尾盘" class="btn btn-primary">收尾盘</button>
+
+                            </p>
+                        </div>
+                        <div id="sc_message">
+                            @*style="width: 300px; height: 400px; background: #ccc; display:none"*@
+                            @*<p><span>设备编号：</span><input id="sc_number" class="form_input" readonly='readonly' placeholder="Text to task" /></p>
+                                <p><span>当前模式：</span><input id="sc_mode" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>当前状态：</span><input id="sc_status" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>任务号：</span><input id="sc_task" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>货物类型：</span><input id="sc_goodstype" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>托盘条码：</span><input id="sc_barcode" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>起始地址：</span><input id="sc_fromstation" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>目标地址：</span><input id="sc_tostation" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>当前列：</span><input id="sc_column" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>当前层：</span><input id="sc_layer" class="form_input" placeholder="Text to task" /></p>
+                                <p><span>设备故障：</span><textarea id="sc_equipmentError" cols="28" rows="2"></textarea></p>*@
+                        </div>
+                        <div id="sc_button" style="width: 300px; height: 250px; background: #ccc; display:none">
+                            <p>
+                                <button id="scBtn_changeMode" class="btn btn-primary">模式切换</button>
+                                <button id="staBtn_equipErrorUrl" class="btn btn-primary">维修经验</button>
+                            </p>
+                            <p>
+                                <button id="scBtn_writeInfo" class="btn btn-primary">写入任务</button>
+                                <button id="scBtn_deleteInfo" class="btn btn-primary">清除任务</button>
+                            </p>
+                        </div>
+                        <div id="robot_message" style="width: 300px; height: 300px; background: #ccc; display:none">
+                            <p><span>设备编号：</span><input id="robot_number" style="z-index:10;background:#c1bbbb;border:none;outline:none" disabled='disabled' placeholder="Text to task" /></p>
+                            <p><span>当前模式：</span><input id="robot_mode" style="z-index:10;background:#c1bbbb;border:none;outline:none" disabled='disabled' placeholder="Text to task" /></p>
+                            <p><span>状态：</span><input id="robot_status" style="z-index:10;background:#c1bbbb;border:none;outline:none" disabled='disabled' placeholder="Text to task" /></p>
+                            <p><span>设备故障：</span><textarea id="robot_equipmentError" cols="28" rows="2"></textarea></p>
+                        </div>
+                        <div id="robot_button" style="width: 300px; height: 380px; background: #ccc; display:none">
+                            <p>
+                                <button id="robot_palletInfo" class="btn btn-primary">通道信息</button>
+                                <button id="robot_equipErrorUrl" class="btn btn-primary">维修经验</button>
+                            </p>
+                            <p>
+                                <button id="robot_funcbutton3" class="btn btn-primary">rob按钮1</button>
+                                <button id="robot_funcbutton4" class="btn btn-primary">rob按钮2</button>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="drapdiv" style="background: #0077b3; float: left; height: 600px; border: 1px solid #F00; position: relative; overflow: scroll; ">
+                        我是监控页面
+                        @*<div class="divcss5_right">布局靠右浮动</div>*@
+                        <div id="big_tc" style="background: #ddd9d9; width: 1000px; height: 260px; display: none;z-index:999 ">
+                            <div id="sc01" style="background: #ffff00; left: 330px; top: 80px; width: 50px; height: 50px;">car</div>
+                        </div>
+                        <button id="h_shrinkBtn" style="position:fixed" class="btn btn-default">收缩</button>
+                        @*<div id="dragDiv" style="width: 300px; height: 300px; background-color: #ccc; position: absolute; "></div>*@
+                        <p id="testvalue"><i>斜体字文本</i> </p>
+                    </div>
+                </div>
+                <div id="logtextdiv">
+                    <textarea id="textarea" style="height: 130px;width:100%"></textarea>
+                </div>
+                @*点击确定后弹出输入用户名、密码按钮点击后弹出的div*@
+                <div id="logindiv">
+                    <p><span id="span1">用户：</span><input id="loginName" class="form-control" /></p>
+                    <p><span id="span2">密码：</span><input id="passWord" class="form-control" /></p>
+                    <button id="login_okText" class="btn btn-primary">确定</button>
+                    <button id="login_cancelText" class="btn btn-default">取消</button>
+                    <span id="tcMsg" style="color: red; ">提示消息</span>
+                </div>
+                @*功能按钮点击后弹出的div*@
+                <div id="funcBtndiv">
+                    <p><span id="span0" style="text-align: center; font-weight:bold;">我是标题</span>
+                    <p><span id="span4">当前站台：</span><input id="funcBtn_fromsta" class="form-control" /></p>
+                    <p><span id="span1">任务号：</span><input id="funcBtn_taskno" class="form-control" /></p>
+                    <p><span id="span2">货物类型：</span><input id="funcBtn_goodtype" class="form-control" /></p>
+                    <p><span id="span3">托盘条码：</span><input id="funcBtn_barcode" class="form-control" /></p>
+                    <p><span id="span5">目标地址：</span><input id="funcBtn_tosta" class="form-control" /></p>
+                    <button id="funcBtn_okText" class="btn btn-primary">确定</button>
+                    <button id="funcBtn_cancelText" class="btn btn-default">取消</button>
+                    <span id="funcBtn_tcMsg" style="color: red; ">提示消息</span>
+                </div>
+            </div>
+            <script type="text/javascript">
+
+            </script>
+            <script src="../Scripts/jquery-1.10.2.min.js"></script>
+            @*<script src="../Scripts/Drap2.js"></script>*@
+            <script src="../Scripts/DrapPicture.js"></script>
+            <script src="../Scripts/jtopo-0.4.8-min.js"></script>
+
+        </div>
+        <div class="tab-pane fade" id="ios">
+            <p>
+                将来显示服务器、接口、后台监控数据
+            </p>
+        </div>
+        <div class="tab-pane fade" id="div_config">
+            <p>配置界面</p>
+        </div>
+        <div class="tab-pane fade" id="div_help">
+            <p>
+                帮助页面
+            </p>
+        </div>
+    </div>
+</body>
+</html>

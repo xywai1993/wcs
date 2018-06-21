@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+
+
+<body>
+    <div id="bigdiv">
+        <div id="topdiv">
+            <div id="heartdiv" style="float: left; height: 600px; width: 230px; border: 1px solid #F00; overflow: scroll; display:none;">
+                设备运行信息
+                <div id="drapdiv" style="background-image: url(../Content/img/cs_x.png); float: left; height: 600px; border: 1px solid #F00; position: relative; overflow: scroll; ">
+                    我是监控页面
+                </div>
+            </div>
+            <div id="logtextdiv">
+                <textarea id="textarea" style="height: 130px;width:100%"></textarea>
+            </div>
+            <div id="logindiv" style="top: 50%; left: 50%; position: fixed; width: 300px; height: 130px; background: #ffffff; display: none;">
+                <p><span>用户：</span><input id="loginName" style="z-index: 10; background: #c1bbbb;" placeholder="请输入用户名" /></p>
+                <p><span>密码：</span><input id="passWord" style="z-index: 10; background: #c1bbbb;" placeholder="请输入密码" /></p>
+                <button id="login_okText" style="width:50px;height:30px;background:#808080">确定</button>
+                <button id="login_cancelText" style="width:50px;height:30px;background:#808080">取消</button>
+                <span id="tcMsg" style="color: red; ">提示消息</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+    </script>
+    <script src="../Scripts/jquery-1.10.2.min.js"></script>
+    @*<script src="../Scripts/DrapPicture.js"></script>*@
+</body>
+</html>
