@@ -12,9 +12,12 @@ const setCanvasWH = function() {
 
 /**
  * 绘制输送机
+ * @param {Object} item 绘制数据包
+ * @param {Number} i   当前数量
+ * @param {Object} stage 绘制舞台
  */
-const crawSSJ = function() {
-    var cc = dataArr[i].DeviceID;
+const crawConvery = function(item, i, stage) {
+    var cc = item.DeviceID;
     var nodeFrom;
 
     var scene = stage.childs[0];
@@ -30,8 +33,8 @@ const crawSSJ = function() {
         var node = nodes[0];
         console.log('你是打印node信息:' + node);
         //存在就更新1.任务号大于1000，读取原来的颜色进行比较更新
-        if (dataArr[i].Tags.TaskNum >= 1000) {
-            if (dataArr[i].DeviceID == dataArr[i].Tags.ToStation) {
+        if (item.Tags.TaskNum >= 1000) {
+            if (item.DeviceID == item.Tags.ToStation) {
                 var stationType = '是';
             } else {
                 var stationType = '否';
@@ -41,9 +44,9 @@ const crawSSJ = function() {
                 '是否申请：' +
                     stationType +
                     '，当前站台号：' +
-                    dataArr[i].DeviceID +
+                    item.DeviceID +
                     ',目标：' +
-                    dataArr[i].Tags.ToStation +
+                    item.Tags.ToStation +
                     ',原来的颜色：' +
                     old_myType
             );
@@ -66,8 +69,8 @@ const crawSSJ = function() {
             node.setSize(50, 50);
             node.myType = 'black';
             console.log('一键清除');
-            if (dataArr[i].Direction == 'T') {
-                if (dataArr[i].Width == '1') {
+            if (item.Direction == 'T') {
+                if (item.Width == '1') {
                     node.setImage(BACEIMGURL + 'guntongHs.png');
                     node.setSize(50, 50);
                 } else {
@@ -75,7 +78,7 @@ const crawSSJ = function() {
                     node.setSize(100, 50);
                 }
             } else {
-                if (dataArr[i].Width == '2') {
+                if (item.Width == '2') {
                     node.setImage(BACEIMGURL + 'bigS.png');
                     node.setSize(100, 50);
                 } else {
@@ -87,7 +90,7 @@ const crawSSJ = function() {
             node.shadow = true;
         }
 
-        if (dataArr[i].Tags.TotalError == true) {
+        if (item.Tags.TotalError == true) {
             node.alarm = '设备报警，请及时处理！'; //添加节点的报警信息
             var ErrorType = '是';
         } else {
@@ -100,8 +103,8 @@ const crawSSJ = function() {
         nodeFrom.myType = 'black';
         nodeFrom.serializedProperties.push('myType');
 
-        if (dataArr[i].Tags.TaskNum >= 1000) {
-            if (dataArr[i].DeviceID == dataArr[i].Tags.ToStation) {
+        if (item.Tags.TaskNum >= 1000) {
+            if (item.DeviceID == item.Tags.ToStation) {
                 nodeFrom.fillColor = '251,143,27';
                 nodeFrom.myType = 'yellow';
             } else {
@@ -113,8 +116,8 @@ const crawSSJ = function() {
         } else {
             nodeFrom.myType = 'picture';
             nodeFrom.shadow = true;
-            if (dataArr[i].Direction == 'T') {
-                if (dataArr[i].Width == '1') {
+            if (item.Direction == 'T') {
+                if (item.Width == '1') {
                     nodeFrom.setImage(BACEIMGURL + 'guntongHs.png');
                     nodeFrom.setSize(50, 50);
                 } else {
@@ -122,7 +125,7 @@ const crawSSJ = function() {
                     nodeFrom.setSize(100, 50);
                 }
             } else {
-                if (dataArr[i].Width == '2') {
+                if (item.Width == '2') {
                     nodeFrom.setImage(BACEIMGURL + 'bigS.png');
                     nodeFrom.setSize(100, 50);
                 } else {
@@ -136,11 +139,11 @@ const crawSSJ = function() {
         nodeFrom.fontColor = '255,255,0'; //字体颜色
         //节点高度宽度
         nodeFrom.textPosition = 'Middle_Center'; //文字显示位置为中间 Bottom_Center是显示再下方
-        var objX = dataArr[i].Coordinate_X;
-        nodeFrom.setLocation(parseInt(objX), parseInt(dataArr[i].Coordinate_Y));
+        var objX = item.Coordinate_X;
+        nodeFrom.setLocation(parseInt(objX), parseInt(item.Coordinate_Y));
 
-        console.log('我是报警：' + dataArr[i].Tags.TotalError);
-        if (dataArr[i].Tags.TotalError == true) {
+        console.log('我是报警：' + item.Tags.TotalError);
+        if (item.Tags.TotalError == true) {
             nodeFrom.alarm = '设备报警，请及时处理！'; //添加节点的报警信息
         }
         nodeFrom.alarmColor = '255,0,0';
@@ -185,13 +188,13 @@ const crawSSJ = function() {
                     })
                     .show();
                 $.each(dataArr, function(i) {
-                    if (stationNo == dataArr[i].DeviceID) {
+                    if (stationNo == item.DeviceID) {
                         $('#sta_station').val(stationNo);
-                        $('#sta_taskno').val(dataArr[i].Tags.TaskNum);
-                        $('#sta_goodtype').val(dataArr[i].Tags.GoodsType);
-                        $('#sta_barcode').val(dataArr[i].Tags.TrayCode);
-                        $('#sta_from').val(dataArr[i].Tags.FromStation);
-                        $('#sta_to').val(dataArr[i].Tags.ToStation);
+                        $('#sta_taskno').val(item.Tags.TaskNum);
+                        $('#sta_goodtype').val(item.Tags.GoodsType);
+                        $('#sta_barcode').val(item.Tags.TrayCode);
+                        $('#sta_from').val(item.Tags.FromStation);
+                        $('#sta_to').val(item.Tags.ToStation);
                     }
                 });
                 //var data = dataArr.filter(function (ele,index,array) {
@@ -232,12 +235,12 @@ const crawSSJ = function() {
                     })
                     .show();
                 $.each(dataArr, function(i) {
-                    if (stationNo == dataArr[i].DeviceID) {
+                    if (stationNo == item.DeviceID) {
                         $('#sta_station').val(stationNo);
                         $('#sta_taskno').val(1000);
-                        $('#sta_goodtype').val(dataArr[i].Tags.GoodsType);
-                        $('#sta_barcode').val(dataArr[i].Tags.TrayCode);
-                        $('#sta_from').val(dataArr[i].Tags.FromStation);
+                        $('#sta_goodtype').val(item.Tags.GoodsType);
+                        $('#sta_barcode').val(item.Tags.TrayCode);
+                        $('#sta_from').val(item.Tags.FromStation);
                         $('#sta_to').val(stationNo);
                     }
                 });
@@ -265,9 +268,102 @@ const crawSSJ = function() {
     }
 };
 
+/**
+ * 绘制堆剁机
+ * @param {Object} item 绘制数据包
+ * @param {Number} i   当前数量
+ * @param {Object} stage 绘制舞台
+ */
+const crawSRM = function(item, i, stage) {
+    console.log('我是sc报文' + item.DeviceType);
+    var scene = stage.childs[0];
+    var cc = item.DeviceID;
+    stage.frames = 24; //设置当前舞台播放的帧数/秒
+    var animates = [{ x: 500 }];
+    for (let i = 0; i < animates.length; i++) {
+        var node = new JTopo.Node('SC02');
+        node.setSize(80, 80);
+        node.setCenterLocation(400 + i * 90, 305);
+        var color = JTopo.util.randomColor();
+        node.setImage(BACEIMGURL + 'sc.png');
+        scene.add(node);
+    }
+
+    var animates = [{ x: 0 }];
+    for (let i = 0; i < animates.length; i++) {
+        var node = new JTopo.Node('SC03');
+        node.setSize(80, 80);
+        node.setCenterLocation(1250 + i * 90, 305);
+        var color = JTopo.util.randomColor();
+        node.setImage(' ../../Contnt/img/sc.png');
+        scene.add(node);
+    }
+
+    function myNode(text, x, y) {
+        var nodeSC = new JTopo.Node(text);
+        nodeSC.fontColor = '0, 0, 0';
+        var color = '255,240,245';
+        nodeSC.fillColor = color;
+        nodeSC.setSize(30, 30);
+        nodeSC.textPosition = 'Middle_Center'; //文字显示位置为中间 Bottom_Center是显示再下方
+        nodeSC.setLocation(parseInt(x), parseInt(y));
+        scene.add(nodeSC);
+    }
+    var a = 0;
+    for (let i = 1; i <= 7; i++) {
+        var x = 330;
+        var y = 230;
+        a = x + 30 * (i - 1);
+        myNode('' + i, a, y);
+    }
+    var b = 0;
+    for (let i = 1; i <= 7; i++) {
+        var x = 330;
+        var y = 355;
+        b = x + 30 * (i - 1);
+        myNode('' + i, b, y);
+    }
+    var h = 0;
+    for (let i = 1; i <= 20; i++) {
+        var x = 850;
+        var y = 230;
+        h = x + 30 * (i - 1);
+        myNode('' + i, h, y);
+    }
+    var g = 0;
+    for (let i = 1; i <= 20; i++) {
+        var x = 850;
+        var y = 350;
+        g = x + 30 * (i - 1);
+        myNode('' + i, g, y);
+    }
+};
+
+/**
+ * 绘制机械手
+ * @param {Object} item 绘制数据包
+ * @param {Number} i   当前数量
+ * @param {Object} stage 绘制舞台
+ */
+const crawPutRobot = function(item) {
+    console.log('我是机械手');
+    var scene = stage.childs[0];
+    var nodeRobot = new JTopo.Node('RB01');
+    nodeRobot.setSize(80, 80);
+    nodeRobot.setLocation(30, 300);
+    nodeRobot.setImage(BACEIMGURL + 'robot.png');
+    scene.add(nodeRobot);
+
+    var nodeRobot = new JTopo.Node('RB02');
+    nodeRobot.setSize(80, 80);
+    nodeRobot.setLocation(1850, 280);
+    nodeRobot.setImage(BACEIMGURL + 'robot.png');
+    scene.add(nodeRobot);
+};
+
 $(document).ready(function() {
     var canvas = document.getElementById('canvas');
-    var stage = new JTopo.Stage(canvas);
+    const stage = new JTopo.Stage(canvas);
     showJTopoToobar(stage); //显示工具栏
     stage.eagleEye.visible = true;
     var scene = new JTopo.Scene(stage);
@@ -296,7 +392,7 @@ $(document).ready(function() {
 
         ws.onmessage = function(e) {
             console.log('连接成功！');
-            console.log('我是原始数据:' + e.data);
+
             const json = JSON.parse(e.data); //连接正式服务端时启用
             //var json = e.data;               //连接模拟服务端时启用
 
@@ -310,106 +406,23 @@ $(document).ready(function() {
                     //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
 
                     $.each(dataArr, function(i, item) {
-                        switch (item.DeviceCode) {
+                        switch (item.DeviceType) {
                             case 'Convery':
-                                crawSSJ();
+                                //绘制输送机
+                                console.log(1);
+
+                                crawConvery(item, i, stage);
                                 break;
                             case 'SRM':
+                                //收到堆垛机数据
+                                console.log(2);
+                                crawSRM(item, i, stage);
                                 break;
                             case 'PutRobot':
+                                //绘制机械手
+                                console.log(3);
+                                crawPutRobot(item, i, stage);
                                 break;
-                        }
-
-                        //绘制输送机
-                        if (item.DeviceType == 'Convery') {
-                        }
-                        //收到堆垛机数据
-                        else if (item.DeviceType == 'SRM') {
-                            console.log('我是sc报文' + dataArr[i].DeviceType);
-                            var scene = stage.childs[0];
-                            var cc = dataArr[i].DeviceID;
-                            stage.frames = 24; //设置当前舞台播放的帧数/秒
-                            var animates = [{ x: 500 }];
-                            for (var i = 0; i < animates.length; i++) {
-                                var node = new JTopo.Node('SC02');
-                                node.setSize(80, 80);
-                                node.setCenterLocation(400 + i * 90, 305);
-                                var color = JTopo.util.randomColor();
-                                node.setImage(' ../../Contnt/img/sc.png');
-                                scene.add(node);
-                            }
-
-                            var animates = [{ x: 0 }];
-                            for (var i = 0; i < animates.length; i++) {
-                                var node = new JTopo.Node('SC03');
-                                node.setSize(80, 80);
-                                node.setCenterLocation(1250 + i * 90, 305);
-                                var color = JTopo.util.randomColor();
-                                node.setImage(' ../../Contnt/img/sc.png');
-                                scene.add(node);
-                            }
-
-                            function myNode(text, x, y) {
-                                var nodeSC = new JTopo.Node(text);
-                                nodeSC.fontColor = '0, 0, 0';
-                                var color = '255,240,245';
-                                nodeSC.fillColor = color;
-                                nodeSC.setSize(30, 30);
-                                nodeSC.textPosition = 'Middle_Center'; //文字显示位置为中间 Bottom_Center是显示再下方
-                                nodeSC.setLocation(parseInt(x), parseInt(y));
-                                scene.add(nodeSC);
-                            }
-                            var a = 0;
-                            for (var i = 1; i <= 7; i++) {
-                                var x = 330;
-                                var y = 230;
-                                a = x + 30 * (i - 1);
-                                myNode('' + i, a, y);
-                            }
-                            var b = 0;
-                            for (var i = 1; i <= 7; i++) {
-                                var x = 330;
-                                var y = 355;
-                                b = x + 30 * (i - 1);
-                                myNode('' + i, b, y);
-                            }
-                            var h = 0;
-                            for (var i = 1; i <= 20; i++) {
-                                var x = 850;
-                                var y = 230;
-                                h = x + 30 * (i - 1);
-                                myNode('' + i, h, y);
-                            }
-                            var g = 0;
-                            for (var i = 1; i <= 20; i++) {
-                                var x = 850;
-                                var y = 350;
-                                g = x + 30 * (i - 1);
-                                myNode('' + i, g, y);
-                            }
-                            //绘制机械手
-
-                            //测试过滤器的用法
-                            //var data1 = dataArr.filter(function (arr) {
-                            //    if (arr.DeviceCode == "SC01") { return arr; }
-                            //    else { return dataArr; }
-                            //});
-                            //console.log("我是修改信息:" + stationNo);
-                            //console.log("我是过滤器:" + arr);
-                        } else if (item.DeviceType == 'PutRobot') {
-                            console.log('我是机械手');
-                            var scene = stage.childs[0];
-                            var nodeRobot = new JTopo.Node('RB01');
-                            nodeRobot.setSize(80, 80);
-                            nodeRobot.setLocation(30, 300);
-                            nodeRobot.setImage(BACEIMGURL + 'robot.png');
-                            scene.add(nodeRobot);
-
-                            var nodeRobot = new JTopo.Node('RB02');
-                            nodeRobot.setSize(80, 80);
-                            nodeRobot.setLocation(1850, 280);
-                            nodeRobot.setImage(BACEIMGURL + 'robot.png');
-                            scene.add(nodeRobot);
                         }
                     });
                     scene.setBackground(BACEIMGURL + 'bg.jpg');
