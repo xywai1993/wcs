@@ -286,48 +286,7 @@ h2 {
     clear: both;
 }
 
-/*.content .left{
-	padding: 20px;
-	text-align: left;
-	float: left;
-	width: 297px;
-}
-
-.content .left ol, ul {
-	padding: 0;
-}
-.content .left li {
-	padding-left: 20px;
-	line-height: 15px;
-	list-style-type: none;
-	background: url(../img/bullet.png) no-repeat 0 14px;
-	text-shadow: 0 1px 0 #ffffff;
-}
-
-.content .left li a {
-	color: #4d4d4d;
-	text-decoration: none;
-	padding: 8px 0;
-	display: block;
-}*/
-
-/* 右侧 */
-.content .right {
-    width: 100%;
-    text-align: left;
-}
-.content .right h1 {
-    font-size: 36px;
-    line-height: 36px;
-}
-.content .right hr {
-    background-image: url(../img/gauze.png);
-    height: 0.75em;
-    border: none;
-    margin: 0.75em 0;
-}
-
-.content .right article,
+article,
 aside,
 details,
 figcaption,
@@ -340,7 +299,7 @@ section,
 summary {
     display: block;
 }
-.content .right .hentry {
+.content .hentry {
     padding: 10px 20px;
     margin: 15px 0;
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -348,26 +307,26 @@ summary {
     background-color: #eee;
     position: relative;
 }
-.content .right .entry-title a {
+.content .entry-title a {
     font-size: 20px;
     text-shadow: 0 1px 1px #fff;
     text-decoration: none;
     color: #0769ad;
 }
 
-.content .right .category {
+.content .category {
     padding: 4px;
     background-color: #ddd;
     border-radius: 5px;
 }
 
-.content .right .entry-meta {
+.content .entry-meta {
     float: right;
     color: #999;
     font-size: 12px;
 }
 
-.content .right .entry-meta .category a {
+.content .entry-meta .category a {
     color: #888;
     text-decoration: none;
 }
