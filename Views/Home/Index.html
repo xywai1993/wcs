@@ -42,7 +42,7 @@
         </li>
     </ul>
     <div id="myTabContent" class="tab-content">
-        <div class="tab-pane active" id="home">
+        <div class="tab-pane " id="home">
             <div class="wrap_div">
                 <div class="content">
                     <div id="content">
@@ -186,9 +186,29 @@
                 显示货位监控
             </p>
         </div>
-        <div class="tab-pane " id="div_config">
-            <p>配置界面</p>
+        <!-- 配置界面开始 -->
+        <div class="tab-pane active" id="div_config">
+            <section class="config-t">
+                <ul class="img-list" id="createItem">
+                    <li data-type="hs">
+                        <img src="../../Content/img/guntongHs.png" width="80px" alt="">
+                    </li>
+                    <li data-type="ss">
+                        <img src="../../Content/img/guntongSs.png" width="80px" alt="">
+                    </li>
+                    <li data-type="sc">
+                        <img src="../../Content/img/sc.png" width="80px" alt="">
+                    </li>
+                    <li data-type="robot">
+                        <img src="../../Content/img/robot.png" width="80px" alt="">
+                    </li>
+                </ul>
+            </section>
+            <section class="config-b">
+                <canvas id="configCanvas"></canvas>
+            </section>
         </div>
+        <!-- 配置界面结束 -->
         <div class="tab-pane" id="div_help">
             <p>
                 帮助页面
@@ -199,7 +219,8 @@
     <script src="../../Scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="../../Scripts/jtopo-0.4.8-min.js"></script>
     <script type="text/javascript" src="../../Scripts/toolbar.js"></script>
-    <script id='code' src="../../Scripts/DrapJtopo.js"></script>
+    <script src="../../Scripts/page/setting.js"></script>
+    <script src="../../Scripts/DrapJtopo.js"></script>
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 ﻿(function() {
     const BACEIMGURL = '../../Content/img/';
-    const SERVERURL = 'ws://192.16.9.2:9201';
+    const SERVERURL = 'ws://192.16.9.3:9201';
 
     /**a
      * 设置canvas宽高
@@ -290,10 +290,7 @@
 
         var scene = new JTopo.Scene(stage);
         stage.eagleEye.visible = true;
-
-        until.loadImg(BACEIMGURL + 'bg.jpg', function(url) {
-            scene.setBackground(url);
-        });
+        scene.setBackground(BACEIMGURL + 'bg.jpg');
 
         setCanvasWH(canvas);
         //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
@@ -446,6 +443,9 @@
                 }
             }
         };
+
+        // 配置界面
+        const settingConfig = scadaConfig();
 
         //初次连接服务端发送报文
         function checkUser(mestype, userName) {
