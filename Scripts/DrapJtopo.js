@@ -166,19 +166,12 @@
                         })
                         .show();
                     stationNo = event.target.text;
-                    console.log('我是当前点击战天号:' + stationNo);
+                    console.log('我是当前点击站台号:' + stationNo);
                 }
             }
             nodeFrom.addEventListener('mouseup', function(event) {
                 currentNode = this;
                 handler(event);
-            });
-            stage.click(function(event) {
-                if (event.button == 0) {
-                    // 右键
-                    // 关闭弹出菜单（div）
-                    $('#contextmenu').hide();
-                }
             });
         }
     };
@@ -210,7 +203,7 @@
             node.setSize(80, 80);
             node.setCenterLocation(1250 + i * 90, 305);
             var color = JTopo.util.randomColor();
-            node.setImage(' ../../Contnt/img/sc.png');
+            node.setImage(BACEIMGURL + 'sc.png');
             scene.add(node);
         }
 
@@ -276,6 +269,16 @@
         scene.add(nodeRobot);
     };
 
+    const until = {
+        loadImg(imgurl, callback) {
+            const img = new Image();
+            img.src = imgurl;
+            img.onload = function() {
+                callback(imgurl);
+            };
+        }
+    };
+
     /**
      * 入口函数
      */
@@ -288,9 +291,13 @@
         var scene = new JTopo.Scene(stage);
         stage.eagleEye.visible = true;
 
+        until.loadImg(BACEIMGURL + 'bg.jpg', function(url) {
+            scene.setBackground(url);
+        });
+
         setCanvasWH(canvas);
         //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
-        // 舞台点击事件
+        // 舞台单击事件
         stage.click(function(event) {
             if (event.button == 0) {
                 // 右键
@@ -298,28 +305,81 @@
                 $('#equipmentinfo').hide();
                 $('#logindiv').hide();
                 $('#UpdateInfo').hide();
+                $('#contextmenu').hide();
+            }
+        });
+
+        //托盘双击事件
+        scene.dbclick(function(event) {
+            if (event.target == null) return;
+            var e = event.target;
+            if (e.text == 'SC01' || e.text == 'SC02' || e.text == 'SC03') {
+                console.log('我是鼠标双击效果堆垛机：' + e.text);
+                console.log('打印进入堆垛机的报文：' + dataArr);
+                $('#equipmentinfo')
+                    .css({
+                        top: event.pageY - 100,
+                        left: event.pageX + 100
+                    })
+                    .show();
+                $('#span0').text('设备号：' + '123');
+                $('#span1').text('设备状态：' + '123');
+                $('#span2').text('报警代码：' + '123');
+                $('#span3').text('堆垛机模式：' + '123');
+                $('#span4').text('手自动：' + '123');
+                $('#span5').text('工位1任务号：' + '123');
+            } else if (e.text == 'RB01' || e.text == 'RB02') {
+                console.log('我是鼠标双击效果堆垛机：' + e.text);
+                console.log('打印进入堆垛机的报文：' + dataArr);
+                $('#equipmentinfo')
+                    .css({
+                        top: event.pageY - 100,
+                        left: event.pageX + 100
+                    })
+                    .show();
+                $('#span0').text('设备号：' + '234');
+                $('#span1').text('设备状态：' + '678');
+                $('#span2').text('报警代码：' + '789');
+                $('#span3').text('堆垛机模式：' + '456');
+                $('#span4').text('手自动：' + '111');
+                $('#span5').text('工位1任务号：' + '4567');
+            } else {
+                $('#equipmentinfo')
+                    .css({
+                        top: event.pageY - 100,
+                        left: event.pageX + 50
+                    })
+                    .show();
+
+                dataArr.forEach(element => {
+                    if (e.text == element.DeviceID) {
+                        $('#span0').text('站台号：' + element.DeviceID);
+                        $('#span1').text('任务号：' + element.Tags.TaskNum);
+                        $('#span4').text('起始地址：' + element.Tags.FromStation);
+                        $('#span5').text('目标地址：' + element.Tags.ToStation);
+                        $('#span3').text('托盘条码：' + element.Tags.TrayCode);
+                        $('#span2').text('货物类型：' + element.Tags.GoodsType);
+                    }
+                });
             }
         });
 
         //连接服务端
-        var ws = '';
+
         var userName = parseInt(Math.random(1) * 888);
         var stationNo;
         var checkFlag = 1;
 
         var time = new Date();
         var systemtime = time.getFullYear() + time.getMonth(); //+ time.getDay()+ time.getHours() + time.getMinutes() + time.getSeconds();
-        console.log('时间：' + systemtime);
-        console.log('开始连接！');
 
-        ws = new WebSocket(SERVERURL); //实例化WebSocket对象
+        const ws = new WebSocket(SERVERURL); //实例化WebSocket对象
         ws.onopen = function(e) {
+            console.log('开始连接！');
             checkUser('Login', userName);
         };
-        var sumNum = 0;
-        var oldArr = []; //全局变量数组
 
-        // 接受服务端返回的数据
+        // 处理服务端返回的数据
         ws.onmessage = function(e) {
             console.log('连接成功！');
 
@@ -328,120 +388,63 @@
             const dataArr = json.Data;
 
             if (json.Sender == 'WCS') {
-                if (json.MesssageType == 'Init') {
-                    dataArr.forEach((item, i) => {
-                        switch (item.DeviceType) {
-                            case 'Convery':
-                                //绘制输送机
-                                console.log(1);
-
-                                crawConvery(item, i, stage);
-                                break;
-                            case 'SRM':
-                                //收到堆垛机数据
-                                console.log(2);
-                                crawSRM(item, i, stage);
-                                break;
-                            case 'PutRobot':
-                                //绘制机械手
-                                console.log(3);
-                                crawPutRobot(item, i, stage);
-                                break;
+                switch (json.MesssageType) {
+                    case 'Init':
+                        dataArr.forEach((item, i) => {
+                            switch (item.DeviceType) {
+                                case 'Convery':
+                                    //绘制输送机
+                                    crawConvery(item, i, stage);
+                                    break;
+                                case 'SRM':
+                                    //收到堆垛机数据
+                                    crawSRM(item, i, stage);
+                                    break;
+                                case 'PutRobot':
+                                    //绘制机械手
+                                    crawPutRobot(item, i, stage);
+                                    break;
+                                default:
+                                    console.log('未知的DeviceType');
+                                    break;
+                            }
+                        });
+                        break;
+                    case 'checkMesg':
+                        //用户权限验证反馈
+                        console.log('我是数据' + json.message);
+                        if (json.message == 1) {
+                            console.log('我是用户验证成功');
+                            $('#tcMsg').text('用户权限验证成功');
+                            checkFlag = true;
+                            console.log('我是成功标识' + checkFlag);
+                        } else if (json.message == 999) {
+                            console.log('我是用户验证失败');
+                            $('#tcMsg').text('用户权限验证失败！请重新输入');
                         }
-                    });
-                    scene.setBackground(BACEIMGURL + 'bg.jpg');
-                    //用户权限验证
-                    $('#login_okText').on('click', function() {
-                        var group = [];
-                        messagetype = 'checkUser';
-                        loginName = $('#loginName').val();
-                        passWord = $('#passWord').val();
-                        group.push({ messagetype: messagetype, userid: loginName, password: passWord });
-                        console.log(group);
-                        ws.send(JSON.stringify(group));
-                    });
-                } else if (json.messagetype == 'checkMesg') {
-                    //用户权限验证反馈
-                    console.log('我是数据' + json.message);
-                    if (json.message == 1) {
-                        console.log('我是用户验证成功');
-                        $('#tcMsg').text('用户权限验证成功');
-                        checkFlag = true;
-                        console.log('我是成功标识' + checkFlag);
-                    } else if (json.message == 999) {
-                        console.log('我是用户验证失败');
-                        $('#tcMsg').text('用户权限验证失败！请重新输入');
-                    }
-                } else if (json.MesssageType == 'Response') {
-                    //服务端信息反馈
-                    console.log('我是进入回复');
-                    console.log('22:' + dataArr.Code);
-                    if (dataArr.Code == '666') {
-                        console.log('我是进入循环');
-                        $('#tcMsg').text(dataArr.Msg);
-                    } else {
-                        $('#tcMsg').text(dataArr.Msg);
-                    }
-                } else if (json.MesssageType == 'serverMonitor') {
-                    //服务端数据监控
-                } else if (json.MesssageType == 'sc') {
-                    //服务端数据监控
+                        break;
+                    case 'Response':
+                        //服务端信息反馈
+                        console.log('我是进入回复');
+                        console.log('22:' + dataArr.Code);
+                        if (dataArr.Code == '666') {
+                            console.log('我是进入循环');
+                            $('#tcMsg').text(dataArr.Msg);
+                        } else {
+                            $('#tcMsg').text(dataArr.Msg);
+                        }
+                        break;
+                    case 'serverMonitor':
+                        //服务端数据监控
+                        break;
+                    case 'sc':
+                        //服务端数据监控
+                        break;
+                    default:
+                        console.log('未知的MesssageType');
+                        break;
                 }
             }
-            //最大的循环
-            scene.dbclick(function(event) {
-                if (event.target == null) return;
-                var e = event.target;
-                if (e.text == 'SC01' || e.text == 'SC02' || e.text == 'SC03') {
-                    console.log('我是鼠标双击效果堆垛机：' + e.text);
-                    console.log('打印进入堆垛机的报文：' + dataArr);
-                    $('#equipmentinfo')
-                        .css({
-                            top: event.pageY - 100,
-                            left: event.pageX + 100
-                        })
-                        .show();
-                    $('#span0').text('设备号：' + '123');
-                    $('#span1').text('设备状态：' + '123');
-                    $('#span2').text('报警代码：' + '123');
-                    $('#span3').text('堆垛机模式：' + '123');
-                    $('#span4').text('手自动：' + '123');
-                    $('#span5').text('工位1任务号：' + '123');
-                } else if (e.text == 'RB01' || e.text == 'RB02') {
-                    console.log('我是鼠标双击效果堆垛机：' + e.text);
-                    console.log('打印进入堆垛机的报文：' + dataArr);
-                    $('#equipmentinfo')
-                        .css({
-                            top: event.pageY - 100,
-                            left: event.pageX + 100
-                        })
-                        .show();
-                    $('#span0').text('设备号：' + '234');
-                    $('#span1').text('设备状态：' + '678');
-                    $('#span2').text('报警代码：' + '789');
-                    $('#span3').text('堆垛机模式：' + '456');
-                    $('#span4').text('手自动：' + '111');
-                    $('#span5').text('工位1任务号：' + '4567');
-                } else {
-                    $('#equipmentinfo')
-                        .css({
-                            top: event.pageY - 100,
-                            left: event.pageX + 50
-                        })
-                        .show();
-
-                    $.each(dataArr, function(i) {
-                        if (e.text == dataArr[i].DeviceID) {
-                            $('#span0').text('站台号：' + dataArr[i].DeviceID);
-                            $('#span1').text('任务号：' + dataArr[i].Tags.TaskNum);
-                            $('#span4').text('起始地址：' + dataArr[i].Tags.FromStation);
-                            $('#span5').text('目标地址：' + dataArr[i].Tags.ToStation);
-                            $('#span3').text('托盘条码：' + dataArr[i].Tags.TrayCode);
-                            $('#span2').text('货物类型：' + dataArr[i].Tags.GoodsType);
-                        }
-                    });
-                }
-            });
         };
 
         //初次连接服务端发送报文
@@ -466,6 +469,17 @@
             console.log('我是写入站台信息报文：' + JSON.stringify(login));
             ws.send(JSON.stringify(login));
         }
+
+        //用户权限验证
+        $('#login_okText').on('click', function() {
+            var group = [];
+            messagetype = 'checkUser';
+            loginName = $('#loginName').val();
+            passWord = $('#passWord').val();
+            group.push({ messagetype: messagetype, userid: loginName, password: passWord });
+            console.log(group);
+            ws.send(JSON.stringify(group));
+        });
 
         //绘画节点
         function drapNode(dataArr) {
@@ -557,33 +571,6 @@
             $('#span0').text(taskno);
         }
 
-        //测试过滤函数数组
-        var arrs = [
-            { name: 'Tom', age: 18, sex: 'boy' },
-            { name: 'jim', age: 19, sex: 'boy' },
-            { name: 'anchor', age: 20, sex: 'boy' },
-            { name: 'lucy', age: 18, sex: 'girl' },
-            { name: 'lily', age: 19, sex: 'girl' }
-        ];
-        //过滤条件
-        var limits = { name: 'Tom', age: 18, sex: 'boy' };
-        //filter回调函数
-        function dofilter(element, index, array) {
-            if (limits.name && limits.name != element.name) {
-                return false;
-            } //姓名过滤
-            else if (limits.age && limits.age != element.age) {
-                return false;
-            } //年龄过滤
-            else if (limits.sex && limits.sex != element.sex) {
-                return false;
-            } //性别过滤
-            return true;
-        }
-        var filtered = arrs.filter(dofilter);
-        console.log('我是原始数组测试：' + JSON.stringify(arrs));
-        console.log('我是过滤数组测试：' + JSON.stringify(filtered));
-
         //红色：237,19,12
         //绿色：48,187,35   浅绿：45,168,131
         //橘黄色：251,143,27
@@ -673,3 +660,30 @@
     init();
     //end
 })();
+
+//测试过滤函数数组
+var arrs = [
+    { name: 'Tom', age: 18, sex: 'boy' },
+    { name: 'jim', age: 19, sex: 'boy' },
+    { name: 'anchor', age: 20, sex: 'boy' },
+    { name: 'lucy', age: 18, sex: 'girl' },
+    { name: 'lily', age: 19, sex: 'girl' }
+];
+//过滤条件
+var limits = { name: 'Tom', age: 18, sex: 'boy' };
+//filter回调函数
+function dofilter(element, index, array) {
+    if (limits.name && limits.name != element.name) {
+        return false;
+    } //姓名过滤
+    else if (limits.age && limits.age != element.age) {
+        return false;
+    } //年龄过滤
+    else if (limits.sex && limits.sex != element.sex) {
+        return false;
+    } //性别过滤
+    return true;
+}
+var filtered = arrs.filter(dofilter);
+console.log('我是原始数组测试：' + JSON.stringify(arrs));
+console.log('我是过滤数组测试：' + JSON.stringify(filtered));
