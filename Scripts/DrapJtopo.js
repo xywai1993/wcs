@@ -445,7 +445,7 @@
         };
 
         // 配置界面
-        const settingConfig = scadaConfig();
+        const settingConfig = scadaConfig(ws);
 
         //初次连接服务端发送报文
         function checkUser(mestype, userName) {

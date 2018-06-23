@@ -454,3 +454,17 @@ summary {
     border: 1px solid rgb(68, 68, 68);
     cursor: default;
 }
+.config-t {
+    display: flex;
+    align-items: center;
+}
+#copyNode {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
