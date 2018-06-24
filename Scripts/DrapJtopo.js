@@ -159,12 +159,9 @@
                 if (event.button == 2) {
                     // 右键
                     // 当前位置弹出菜单（div）
-                    $('#contextmenu')
-                        .css({
-                            top: event.pageY,
-                            left: event.pageX
-                        })
-                        .show();
+
+                    homeVue.showContextmenu = true;
+                    homeVue.contextmenuXY = [event.pageX, event.pageY];
                     stationNo = event.target.text;
                     console.log('我是当前点击站台号:' + stationNo);
                 }
@@ -294,15 +291,18 @@
 
         setCanvasWH(canvas);
         //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
+
+        let wsDataArr = [];
         // 舞台单击事件
         stage.click(function(event) {
             if (event.button == 0) {
                 // 右键
                 // 关闭弹出菜单（div）
-                $('#equipmentinfo').hide();
+                homeVue.showEquipmentinfo = false;
                 $('#logindiv').hide();
                 $('#UpdateInfo').hide();
-                $('#contextmenu').hide();
+
+                homeVue.showContextmenu = false;
             }
         });
 
@@ -310,59 +310,55 @@
         scene.dbclick(function(event) {
             if (event.target == null) return;
             var e = event.target;
-            if (e.text == 'SC01' || e.text == 'SC02' || e.text == 'SC03') {
-                console.log('我是鼠标双击效果堆垛机：' + e.text);
-                console.log('打印进入堆垛机的报文：' + dataArr);
-                $('#equipmentinfo')
-                    .css({
-                        top: event.pageY - 100,
-                        left: event.pageX + 100
-                    })
-                    .show();
-                $('#span0').text('设备号：' + '123');
-                $('#span1').text('设备状态：' + '123');
-                $('#span2').text('报警代码：' + '123');
-                $('#span3').text('堆垛机模式：' + '123');
-                $('#span4').text('手自动：' + '123');
-                $('#span5').text('工位1任务号：' + '123');
-            } else if (e.text == 'RB01' || e.text == 'RB02') {
-                console.log('我是鼠标双击效果堆垛机：' + e.text);
-                console.log('打印进入堆垛机的报文：' + dataArr);
-                $('#equipmentinfo')
-                    .css({
-                        top: event.pageY - 100,
-                        left: event.pageX + 100
-                    })
-                    .show();
-                $('#span0').text('设备号：' + '234');
-                $('#span1').text('设备状态：' + '678');
-                $('#span2').text('报警代码：' + '789');
-                $('#span3').text('堆垛机模式：' + '456');
-                $('#span4').text('手自动：' + '111');
-                $('#span5').text('工位1任务号：' + '4567');
-            } else {
-                $('#equipmentinfo')
-                    .css({
-                        top: event.pageY - 100,
-                        left: event.pageX + 50
-                    })
-                    .show();
+            let showData = [];
+            switch (e.text) {
+                case 'SC01':
+                case 'SC02':
+                case 'SC03':
+                    showData = [
+                        { title: '设备号', content: '123' },
+                        { title: '设备状态', content: '123' },
+                        { title: '报警代码', content: '123' },
+                        { title: '堆垛机模式', content: '123' },
+                        { title: '手自动', content: '123' },
+                        { title: '工位1任务号', content: '123' }
+                    ];
 
-                dataArr.forEach(element => {
-                    if (e.text == element.DeviceID) {
-                        $('#span0').text('站台号：' + element.DeviceID);
-                        $('#span1').text('任务号：' + element.Tags.TaskNum);
-                        $('#span4').text('起始地址：' + element.Tags.FromStation);
-                        $('#span5').text('目标地址：' + element.Tags.ToStation);
-                        $('#span3').text('托盘条码：' + element.Tags.TrayCode);
-                        $('#span2').text('货物类型：' + element.Tags.GoodsType);
-                    }
-                });
+                    break;
+                case 'RB01':
+                case 'RB02':
+                    showData = [
+                        { title: '设备号', content: '234' },
+                        { title: '设备状态', content: '678' },
+                        { title: '报警代码', content: '789' },
+                        { title: '堆垛机模式', content: '111' },
+                        { title: '手自动', content: '12333' },
+                        { title: '工位1任务号', content: '34332' }
+                    ];
+
+                    break;
+                default:
+                    wsDataArr.forEach(element => {
+                        if (e.text == element.DeviceID) {
+                            showData = [
+                                { title: '站台号', content: element.DeviceID },
+                                { title: '任务号', content: element.Tags.TaskNum },
+                                { title: '起始地址', content: element.Tags.FromStation },
+                                { title: '目标地址', content: element.Tags.ToStation },
+                                { title: '托盘条码', content: element.Tags.TrayCode },
+                                { title: '货物类型', content: element.Tags.GoodsType }
+                            ];
+                        }
+                    });
+                    break;
             }
+            homeVue.equipmentinfo = showData;
+            homeVue.copyEquipmentinfo = JSON.parse(JSON.stringify(showData));
+            homeVue.showEquipmentinfo = true;
+            homeVue.equipmentinfoXY = [event.pageX + 50, event.pageY - 100];
         });
 
         //连接服务端
-
         var userName = parseInt(Math.random(1) * 888);
         var stationNo;
         var checkFlag = 1;
@@ -383,6 +379,7 @@
             const json = JSON.parse(e.data); //连接正式服务端时启用
             //var json = e.data;               //连接模拟服务端时启用
             const dataArr = json.Data;
+            wsDataArr = dataArr;
             //console.log(dataArr);
 
             if (json.Sender == 'WCS') {
@@ -534,16 +531,6 @@
             console.log(message);
             ws.send(JSON.stringify(message));
         });
-        //按钮事件：点击取消按钮内容清0
-        $('#write_cancelText').on('click', function() {
-            $('#UpdateInfo').hide();
-            $('#sta_station').val(0);
-            $('#sta_taskno').val(0);
-            $('#sta_to').val(0);
-            $('#sta_goodtype').val(0);
-            $('#sta_barcode').val(0);
-        });
-
         //给后台写站台信息
         function writeInfo(mestype, userName) {
             var login = [];
@@ -577,84 +564,34 @@
         //橘黄色：251,143,27
         //255,240,245 仓紫色
 
-        /* 右键菜单处理 */
-        $('#contextmenu a').click(function() {
-            var text = $(this).text();
-            if (text == '修改信息') {
-                $('#UpdateInfo')
-                    .css({
-                        top: event.pageY - 200,
-                        left: event.pageX + 50
-                    })
-                    .show();
-                $.each(dataArr, function(i) {
-                    if (stationNo == item.DeviceID) {
-                        $('#sta_station').val(stationNo);
-                        $('#sta_taskno').val(item.Tags.TaskNum);
-                        $('#sta_goodtype').val(item.Tags.GoodsType);
-                        $('#sta_barcode').val(item.Tags.TrayCode);
-                        $('#sta_from').val(item.Tags.FromStation);
-                        $('#sta_to').val(item.Tags.ToStation);
+        // 界面交互数据入口
+        const homeVue = new Vue({
+            el: '#homeVue',
+            data: {
+                equipmentinfo: [],
+                copyEquipmentinfo: [],
+                showEquipmentinfo: false,
+                equipmentinfoXY: [0, 0]
+            },
+            methods: {
+                changeEquipmentinfo() {}
+            },
+            filters: {
+                goodsType(type) {
+                    let data = '';
+                    switch (type) {
+                        case 1:
+                            data = '空物';
+                            break;
+                        case 2:
+                            data = '实物';
+                            break;
+                        default:
+                            break;
                     }
-                });
-                //var data = dataArr.filter(function (ele,index,array) {
-                //    if (ele.length > 2) { return true; }
-                //    else { return false; }
-                //});
-                //var data1 = dataArr.filter(function (arr) {
-                //    if (arr.DeviceCode == "2001") {
-                //        return arr;
-                //        console.log("我是打印过滤器内容:" + arr.DeviceCode);
-                //    }
-                //    else
-                //    {
-                //        return dataArr;
-                //    }
-                //});
-                console.log('我是过滤器:' + data1);
+                    return data;
+                }
             }
-            if (text == '一键清除') {
-                $('#UpdateInfo')
-                    .css({
-                        top: event.pageY,
-                        left: event.pageX
-                    })
-                    .show();
-                $('#sta_station').val(stationNo);
-                $('#sta_taskno').val(0);
-                $('#sta_from').val(0);
-                $('#sta_to').val(0);
-                $('#sta_goodtype').val(0);
-                $('#sta_barcode').val(0);
-                console.log('我是清除信息:' + stationNo);
-            } else if (text == '一键申请') {
-                $('#UpdateInfo')
-                    .css({
-                        top: event.pageY,
-                        left: event.pageX
-                    })
-                    .show();
-                $.each(dataArr, function(i) {
-                    if (stationNo == item.DeviceID) {
-                        $('#sta_station').val(stationNo);
-                        $('#sta_taskno').val(1000);
-                        $('#sta_goodtype').val(item.Tags.GoodsType);
-                        $('#sta_barcode').val(item.Tags.TrayCode);
-                        $('#sta_from').val(item.Tags.FromStation);
-                        $('#sta_to').val(stationNo);
-                    }
-                });
-            } else if (text == '正常排出') {
-                console.log('我是创建div:');
-                var Odiv = document.createElement('div');
-                var Ospan = document.createElement('span');
-                Odiv.style.cssText = 'width:200px;height:200px;background:#636363;';
-                Odiv.appendChild(Ospan);
-            } else if (text == '异常排出') {
-                currentNode.scaleX += 0.2;
-                currentNode.scaleY += 0.2;
-            }
-            $('#contextmenu').hide();
         });
     };
 

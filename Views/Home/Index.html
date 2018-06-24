@@ -43,14 +43,13 @@
     </ul>
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane active" id="home">
-            <div class="wrap_div">
-                <div class="content">
-                    <div id="content">
-                        <canvas id="canvas"></canvas>
-                    </div>
-                </div>
-                <!-- 点击右键站台时，弹出的列表内容 ul是无序列表*@ -->
-                <ul id="contextmenu" class="contextmenu" style="display:none;">
+
+            <div id="content">
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <section id="homeVue">
+                <ul id="contextmenu" class="contextmenu" v-show="showContextmenu" :style="{left:contextmenuXY[0]+'px',top:contextmenuXY[1]+'px'}">
                     <li>
                         <a>修改信息</a>
                     </li>
@@ -81,29 +80,44 @@
                         <button id="login_cancelText" class="btn btn-default">取消</button>
                     </li>
                 </ul>
-                <ul id="equipmentinfo" style="display:none;">
-                    <li>
-                        <span id="span0">1：</span>
-                    </li>
-                    <li>
-                        <span id="span1">任务号：</span>
-                    </li>
-                    <li>
-                        <span id="span2">货物类型：</span>
-                    </li>
-                    <li>
-                        <span id="span3">托盘条码：</span>
-                    </li>
-                    <li>
-                        <span id="span4">起始地址：</span>
-                    </li>
-                    <li>
-                        <span id="span5">目标地址：</span>
-                    </li>
-                    <li>
-                        <span id="span6">外形检测：</span>
-                    </li>
-                </ul>
+
+
+                <section class=" panel panel-default info-modal " v-show="showEquipmentinfo" :style="{left:equipmentinfoXY[0]+'px',top:equipmentinfoXY[1]+'px'}">
+                    <div class="panel-heading">站台号</div>
+                    <div class="panel-body info-modal-content">
+                        <div>
+                            <h3>当前信息</h3>
+                            <ul class="modify-info">
+                                <li v-for="item in copyEquipmentinfo">
+                                    <span> {{item.title}}:</span>
+                                    <i>{{item.content}}</i>
+                                </li>
+                            </ul>
+                            <h5>设备报警</h5>
+                            <div>无</div>
+                        </div>
+                        <div style="width: 300px;">
+                            <h3>修改信息</h3>
+                            <ul class="modify-info">
+                                <li v-for="item in equipmentinfo">
+                                    <span> {{item.title}}:</span>
+                                    <input type="text" class="form-control" v-model="item.content">
+                                </li>
+                            </ul>
+                            <button class="btn btn-primary" @click="changeEquipmentinfo">确定修改</button>
+                        </div>
+                        <div style="width: 120px">
+                            <h3>功能按钮</h3>
+                            <div>
+
+                                <button class="btn btn-primary until-btn " v-for="item in equipmentinfo">一键清除</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
                 <ul id="UpdateInfo" style="display:none;">
                     <li>站台号
                         <input id="sta_station" class="form-control" />
@@ -159,8 +173,10 @@
                         <span id="span8">当前层：</span>
                     </li>
                 </ul>
+            </section>
 
-            </div>
+
+
 
 
 
@@ -237,8 +253,8 @@
     <script type="text/javascript " src="../../Scripts/jquery-1.10.2.min.js "></script>
     <script src="../../Scripts/bootstrap.min.js "></script>
     <script src="../../Scripts/vue.dev2.0.js "></script>
-    <script type="text/javascript " src="../../Scripts/jtopo-0.4.8-min.js "></script>
-    <script type="text/javascript " src="../../Scripts/toolbar.js "></script>
+    <script src="../../Scripts/jtopo-0.4.8-min.js "></script>
+    <script src="../../Scripts/toolbar.js "></script>
     <script src="../../Scripts/page/config.js/"></script>
     <script src="../../Scripts/page/setting.js "></script>
     <script src="../../Scripts/DrapJtopo.js "></script>

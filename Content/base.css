@@ -1,62 +1,9 @@
-﻿/* body {
-    margin: auto;
-    background: rgb(7, 105, 173);
-    font-family: 微软雅黑;
-    font-size: 14px;
-}
-* {
-    padding: 0px;
-    margin: 0px;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-weight: 700;
-    font-family: 'klavika-web', 'Helvetica Neue', Helvetica, Arial, Geneva, sans-serif !important;
-}
-
-h1 {
-    font-size: 2em;
-    margin: 0 0 0.33em;
-}
-
-ol,
-ul,
-li {
-    list-style: none;
-} */
-
-/* 页眉、页脚-- 开始*/
+﻿/* 页眉、页脚-- 开始*/
 #global-nav {
     height: 34px;
     background: url(../img/jq-global-nav.png) repeat-x 0 bottom #1b1b1b;
     border-bottom: 1px solid #7acef4;
 }
-
-/* 居中包装层 */
-/*.wrap_div{	
-	width: 1240px;
-}
-
-.wrap_div .head_nav{
-	height: 100px;
-	width: 100%;	
-}
-.wrap_div .head_nav h2.logo a {
-	width: 243px;
-	background: url(../img/logo-jtopo.png) no-repeat;
-}
-.wrap_div h2.logo a {
-	float: left;
-	display: block;
-	height: 66px;
-	overflow: hidden;
-	text-indent: -1000px;
-}*/
 
 /* 导航 */
 .head_nav_second {
@@ -382,22 +329,8 @@ summary {
     background: #fff;
 }
 
-#equipmentinfo {
-    border: 1px solid #aaa;
-    border-bottom: 0;
-    background: #eee;
-    position: absolute;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: none;
-}
-
 #equipmentinfo li span {
-    display: block;
-    padding: 10px;
-    border-bottom: 1px solid #aaa;
-    cursor: pointer;
+    color: #999;
 }
 
 #equipmentinfo li span:hover {
@@ -512,4 +445,41 @@ summary {
     text-decoration: none;
     color: #e8d5d5;
     font-size: 16px;
+}
+.info-modal {
+    position: absolute;
+}
+.info-modal-content {
+    display: flex;
+    overflow: hidden;
+}
+.info-modal h3 {
+    font-size: 16px;
+}
+.info-modal-content > div {
+    padding: 0 20px;
+    border-left: 1px solid #ededed;
+}
+.info-modal-content > div:first-child {
+    border-left: none;
+}
+.modify-info {
+    padding-left: 0;
+}
+.modify-info li {
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+.modify-info li span {
+    width: 80px;
+    margin-right: 10px;
+    display: block;
+    color: #999999;
+}
+.modify-info input {
+    width: 160px;
+}
+.until-btn {
+    margin-top: 10px;
 }
