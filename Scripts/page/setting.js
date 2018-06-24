@@ -1,18 +1,7 @@
-const BACEWHPX = 80;
-const BACEIMGURL = '../../Content/img/';
-const IMGSRC = {
-    'convery-t': BACEIMGURL + 'guntongHs.png',
-    'convery-v': BACEIMGURL + 'guntongSs.png',
-    srm: BACEIMGURL + 'sc.png',
-    robot: BACEIMGURL + 'robot.png',
-    bg: BACEIMGURL + 'bg.jpg'
-};
-const DEVICETYPE = {
-    'convery-t': 'Convery',
-    'convery-v': 'Convery',
-    srm: 'SRM',
-    robot: 'PutRobot'
-};
+/**
+ *  yiper.fan 学不进  2018.6.22
+ */
+
 /**a
  * 设置canvas宽高
  * @param {DOMNode} c
@@ -24,85 +13,51 @@ const setCanvasWH = function(c) {
     $(c).attr('height', $(window).get(0).innerHeight);
 };
 
-const createTimeStamp = function() {
-    const date = new Date();
-    return `${date.getFullYear()}${date.getMonth()}${date.getDay()}${date.getTime()}`;
-};
 //初始编号
 
 const scadaConfig = function(ws) {
+    const BACEIMGURL = '../../Content/img/';
+    const IMGSRC = {
+        'convery-t': BACEIMGURL + 'guntongHs.png',
+        'convery-v': BACEIMGURL + 'guntongSs.png',
+        srm: BACEIMGURL + 'sc.png',
+        robot: BACEIMGURL + 'robot.png',
+        bg: BACEIMGURL + 'bg.jpg'
+    };
+    const DEVICETYPE = {
+        'convery-t': 'Convery',
+        'convery-v': 'Convery',
+        srm: 'SRM',
+        robot: 'PutRobot'
+    };
+
     const canvas = document.getElementById('configCanvas');
     setCanvasWH(canvas);
     const stage = new JTopo.Stage(canvas);
-
-    var scene = new JTopo.Scene(stage);
+    const scene = new JTopo.Scene(stage);
     scene.setBackground(IMGSRC.bg);
-    // stage.wheelZoom = 0.85;
+    //stage.wheelZoom = 0.85;
 
     let createNodeIndex = 1;
     let startCopy = false;
-    let $copyNode = $('#copyNode');
+    let currentNode = null;
+    const $copyNode = $('#copyNode');
+    const $contextmenu = $('#configContextmenu');
     let createType = '';
-    $copyNode.css({ width: BACEWHPX, height: BACEWHPX });
-    //action
-    //点击创建
-    // $('#createItem>li').on('click', function() {
-    //     const type = $(this).attr('data-type');
-    //     createNode(type);
-    // });
 
-    $('#createItem>li').on('mousedown', function(e) {
-        //const type = $(this).attr('data-type');
-        //createNode(type);
-        createType = $(this).attr('data-type');
-        const x = e.pageX - BACEWHPX / 2;
-        const y = e.pageY - BACEWHPX / 2;
-        startCopy = true;
-        console.log(IMGSRC[createType]);
-
-        $copyNode.show().css({ backgroundImage: `url(${IMGSRC[createType]})`, top: y, left: x });
-        console.log(e);
-    });
-
-    $(document).on('mousemove', function(e) {
-        if (startCopy) {
-            const x = e.pageX - BACEWHPX / 2;
-            const y = e.pageY - BACEWHPX / 2;
-            $copyNode.css({ top: y, left: x });
+    //
+    stage.click(function(e) {
+        if (e.button == 0) {
+            configVue.contextmenu = false;
         }
     });
 
-    $(document).on('mouseup', function(e) {
-        console.log(canvas.offsetTop);
-
-        // const zoom = stage.wheelZoom;
-        console.log();
-        // 画布缩放后会有误差， 需 计算 画布放大或缩小的倍数
-        if (startCopy) {
-            console.log(scene);
-
-            const canvasOffsetTop = canvas.offsetTop;
-            const canvasOffsetLeft = canvas.offsetLeft;
-            $copyNode.hide();
-            createNode(createType, e.pageX - canvasOffsetLeft, e.pageY - canvasOffsetTop);
-            startCopy = false;
-        }
-    });
-
-    // stage.mouseup(function(e) {
-    //     console.log(1111);
-
-    //     if (startCopy) {
-    //         $copyNode.hide();
-    //         createNode(createType, e.x, e.y);
-    //         startCopy = false;
-    //     }
-    // });
-
-    $('#commitConfig').on('click', function() {
-        commit();
-    });
-
+    /**
+     * 创建新节点
+     * @param {String} type 设备类型 见常量DEVICETYPE
+     * @param {Number} x  节点坐标
+     * @param {Number} y  节点坐标
+     */
     const createNode = function(type, x, y) {
         const node = new JTopo.Node(createNodeIndex);
         switch (type) {
@@ -120,24 +75,32 @@ const scadaConfig = function(ws) {
                 break;
         }
         node.devType = type;
+        node.font = '16px';
+        node.textPosition = 'Middle_Center';
         node.setImage(IMGSRC[type]);
         node.setSize(BACEWHPX, BACEWHPX);
         createNodeIndex++;
         //node.setLocation(-11, -6);
+        //node.selected = true;
         scene.add(node);
 
-        //拖拽完成修复位置
+        //修复位置
         node.setCenterLocation(fixXY(x), fixXY(y));
 
         node.mouseup(function(e) {
             node.setCenterLocation(fixXY(e.x), fixXY(e.y));
+            currentNode = this;
+            if (e.button == 2) {
+                configVue.contextmenu = true;
+                configVue.contextmenuXY = [e.pageX, e.pageY];
+            }
         });
     };
 
     /**
      * //吸附功能
      * @param {Number} num  要修复的数据
-     * @param {Number} base  要吸附的数据
+     * @param {Number} base  吸附的参考值
      */
     const fixXY = function(num, base = BACEWHPX) {
         const n = Number(num);
@@ -179,7 +142,7 @@ const scadaConfig = function(ws) {
         });
 
         const reqData = {
-            MessageID: createTimeStamp(),
+            MessageID: scadaUntil.createTimeStamp(),
             Sender: 'WCS',
             Receivcer: 'WMS',
             ZoneCode: '553EFD8264E94FCC8F355A58C0808419',
@@ -190,6 +153,71 @@ const scadaConfig = function(ws) {
         };
         console.log(reqData);
     };
+
+    /**
+     * 克隆节点
+     * @param {*} num
+     */
+    const cloneNode = function(num) {
+        if (num == 0) {
+            return;
+        }
+        const x = currentNode.x;
+        const y = currentNode.y;
+
+        new Array(num).fill(1).forEach((item, i) => {
+            console.log(i);
+            if (currentNode.direction == 'T') {
+                createNode(createType, x + BACEWHPX, y + (i + 2) * BACEWHPX);
+            } else {
+                createNode(createType, x + (i + 2) * BACEWHPX, y + BACEWHPX);
+            }
+        });
+        console.log(currentNode);
+    };
+
+    /**
+     * 重命名
+     * @param {String} name 重命名
+     */
+    const renameNode = function(name) {
+        if (!name) {
+            return;
+        }
+        currentNode.text = name;
+    };
+
+    /**
+     *  交互动作 入口
+     */
+    const configVue = new Vue({
+        el: '#configVue',
+        data: {
+            contextmenu: false,
+            contextmenuXY: [100, 100],
+            cloneNum: 1, //复制数量
+            rename: ''
+        },
+        methods: {
+            createNode(type) {
+                createType = type;
+                createNode(type, 150, 150);
+            },
+            renameNode() {
+                renameNode(this.rename);
+            },
+            delNode() {
+                scene.remove(currentNode);
+                this.contextmenu = false;
+            },
+            clone() {
+                cloneNode(this.cloneNum);
+            },
+            commit() {
+                commit();
+            }
+        }
+    });
 
     return {};
 };

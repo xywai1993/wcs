@@ -1,6 +1,6 @@
 ﻿(function() {
     const BACEIMGURL = '../../Content/img/';
-    const SERVERURL = 'ws://192.16.9.3:9201';
+    const SERVERURL = 'ws://192.16.9.2:9201';
 
     /**a
      * 设置canvas宽高
@@ -383,6 +383,7 @@
             const json = JSON.parse(e.data); //连接正式服务端时启用
             //var json = e.data;               //连接模拟服务端时启用
             const dataArr = json.Data;
+            //console.log(dataArr);
 
             if (json.Sender == 'WCS') {
                 switch (json.MesssageType) {

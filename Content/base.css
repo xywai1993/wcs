@@ -95,9 +95,7 @@ li {
 .head_nav_second .menu li a:hover {
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.1) 0 1px 0;
 }
-.active {
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.1) 0 1px 0;
-}
+
 /* 页脚 */
 .footer {
     height: 120px;
@@ -342,7 +340,7 @@ summary {
     padding-bottom: 10px;
 }
 
-#contextmenu {
+.contextmenu {
     border: 1px solid #aaa;
     border-bottom: 0;
     background: #eee;
@@ -350,17 +348,15 @@ summary {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: none;
 }
 
-#contextmenu li a {
-    display: block;
+.contextmenu li {
     padding: 10px;
     border-bottom: 1px solid #aaa;
     cursor: pointer;
 }
 
-#contextmenu li a:hover {
+.contextmenu li:hover {
     background: #fff;
 }
 
@@ -446,6 +442,27 @@ summary {
 .img-list {
     display: flex;
     list-style: none;
+    padding: 10px;
+}
+.img-list > li {
+    margin: 0 30px;
+    width: 80px;
+    height: 80px;
+    text-align: center;
+}
+.img-list > li:hover {
+    margin-top: -5px;
+}
+.img-list > li:hover > img {
+    opacity: 0.9;
+}
+.img-list > li > img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+.img-list > li:hover {
+    background-color: #eeeeee;
 }
 #configCanvas {
     height: 100vh;
@@ -455,8 +472,10 @@ summary {
     cursor: default;
 }
 .config-t {
+    padding: 0 20px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
 #copyNode {
     display: none;
@@ -467,4 +486,30 @@ summary {
     background-position: left top;
     background-repeat: no-repeat;
     background-size: contain;
+}
+.nav-menu {
+    display: flex;
+    list-style: none;
+    padding: 10px;
+    margin-bottom: 0;
+    background: #1079c1;
+}
+
+.nav-menu > li.active {
+    box-shadow: none;
+    background: #eeeeee;
+    border-radius: 6px;
+}
+.nav-menu > li.active > a {
+    color: #428bca;
+}
+.nav-menu > li > a {
+    padding: 0 30px;
+    display: block;
+    height: 50px;
+    line-height: 50px;
+    outline: none;
+    text-decoration: none;
+    color: #e8d5d5;
+    font-size: 16px;
 }

@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <ul id="myTab" class="nav nav-tabs">
+    <ul id="myTab" class="nav-menu">
         <li class="active">
             <a href="#home" data-toggle="tab">
                 wcs监控
@@ -42,7 +42,7 @@
         </li>
     </ul>
     <div id="myTabContent" class="tab-content">
-        <div class="tab-pane " id="home">
+        <div class="tab-pane active" id="home">
             <div class="wrap_div">
                 <div class="content">
                     <div id="content">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 <!-- 点击右键站台时，弹出的列表内容 ul是无序列表*@ -->
-                <ul id="contextmenu" style="display:none;">
+                <ul id="contextmenu" class="contextmenu" style="display:none;">
                     <li>
                         <a>修改信息</a>
                     </li>
@@ -187,42 +187,61 @@
             </p>
         </div>
         <!-- 配置界面开始 -->
-        <div class="tab-pane active" id="div_config">
-            <section class="config-t">
+        <div class="tab-pane " id="div_config">
+            <section class="config-t" id="configVue">
                 <ul class="img-list" id="createItem">
-                    <li data-type="convery-t">
+                    <li data-type="convery-t" @click="createNode('convery-t')">
                         <img src="../../Content/img/guntongHs.png" width="80px" alt="">
                     </li>
-                    <li data-type="convery-v">
+                    <li data-type="convery-v" @click="createNode('convery-v')">
                         <img src="../../Content/img/guntongSs.png" width="80px" alt="">
                     </li>
-                    <li data-type="srm">
+                    <li data-type="srm" @click="createNode('srm')">
                         <img src="../../Content/img/sc.png" width="80px" alt="">
                     </li>
-                    <li data-type="robot">
+                    <li data-type="robot" @click="createNode('robot')">
                         <img src="../../Content/img/robot.png" width="80px" alt="">
                     </li>
                 </ul>
-                <button class="btn btn-primary" id="commitConfig">提交配置</button>
+
+                <button class="btn btn-primary" id="commitConfig" @click="commit">提交配置</button>
+                <!-- <div id="copyNode"></div> -->
+                <ul id="configContextmenu" class="contextmenu" v-show="contextmenu" :style="{left:contextmenuXY[0]+'px',top:contextmenuXY[1]+'px'}">
+                    <li class="input-group">
+                        <input type="text" class="form-control" style="width: 100px " placeholder="输入新命名" v-model="rename">
+                        <button class="btn btn-primary " @click="renameNode " style="margin-left:10px ">重命名</button>
+                    </li>
+                    <li class="input-group ">
+                        <input type="number " class="form-control " style="width: 100px " placeholder="输入复制数量
+                        " v-model="cloneNum ">
+                        <button class="btn btn-primary " @click="clone " style="margin-left:10px ">复制</button>
+                    </li>
+                    <li @click="delNode">
+                        删除
+                    </li>
+                </ul>
             </section>
             <section class="config-b">
                 <canvas id="configCanvas"></canvas>
             </section>
-            <div id="copyNode"></div>
+
+
         </div>
         <!-- 配置界面结束 -->
-        <div class="tab-pane" id="div_help">
+        <div class="tab-pane " id="div_help ">
             <p>
                 帮助页面
             </p>
         </div>
     </div>
-    <script type="text/javascript" src="../../Scripts/jquery-1.10.2.min.js"></script>
-    <script src="../../Scripts/bootstrap.min.js"></script>
-    <script type="text/javascript" src="../../Scripts/jtopo-0.4.8-min.js"></script>
-    <script type="text/javascript" src="../../Scripts/toolbar.js"></script>
-    <script src="../../Scripts/page/setting.js"></script>
-    <script src="../../Scripts/DrapJtopo.js"></script>
+    <script type="text/javascript " src="../../Scripts/jquery-1.10.2.min.js "></script>
+    <script src="../../Scripts/bootstrap.min.js "></script>
+    <script src="../../Scripts/vue.dev2.0.js "></script>
+    <script type="text/javascript " src="../../Scripts/jtopo-0.4.8-min.js "></script>
+    <script type="text/javascript " src="../../Scripts/toolbar.js "></script>
+    <script src="../../Scripts/page/config.js/"></script>
+    <script src="../../Scripts/page/setting.js "></script>
+    <script src="../../Scripts/DrapJtopo.js "></script>
 </body>
 
 </html>
