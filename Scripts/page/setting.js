@@ -52,6 +52,14 @@ const scadaConfig = function(ws) {
         }
     });
 
+    scene.dbclick(function(event) {
+        if (event.target == null) return;
+        const e = event.target;
+        console.log(event);
+
+        configVue.contextmenu = true;
+        configVue.contextmenuXY = [event.pageX + 30, event.pageY + 30];
+    });
     /**
      * 创建新节点
      * @param {String} type 设备类型 见常量DEVICETYPE
@@ -90,10 +98,10 @@ const scadaConfig = function(ws) {
         node.mouseup(function(e) {
             node.setCenterLocation(fixXY(e.x), fixXY(e.y));
             currentNode = this;
-            if (e.button == 2) {
-                configVue.contextmenu = true;
-                configVue.contextmenuXY = [e.pageX, e.pageY];
-            }
+            // if (e.button == 2) {
+            //     configVue.contextmenu = true;
+            //     configVue.contextmenuXY = [e.pageX, e.pageY];
+            // }
         });
     };
 
@@ -152,6 +160,7 @@ const scadaConfig = function(ws) {
             data: data
         };
         console.log(reqData);
+        ws.send(reqData);
     };
 
     /**
@@ -165,7 +174,7 @@ const scadaConfig = function(ws) {
         const x = currentNode.x;
         const y = currentNode.y;
 
-        new Array(num).fill(1).forEach((item, i) => {
+        new Array(Number(num)).fill(1).forEach((item, i) => {
             console.log(i);
             if (currentNode.direction == 'T') {
                 createNode(createType, x + BACEWHPX, y + (i + 2) * BACEWHPX);
@@ -201,7 +210,7 @@ const scadaConfig = function(ws) {
         methods: {
             createNode(type) {
                 createType = type;
-                createNode(type, 150, 150);
+                createNode(type, 100, 100);
             },
             renameNode() {
                 renameNode(this.rename);

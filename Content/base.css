@@ -1,4 +1,9 @@
-﻿/* 页眉、页脚-- 开始*/
+﻿body {
+    overflow: scroll;
+}
+
+/* 页眉、页脚-- 开始*/
+
 #global-nav {
     height: 34px;
     background: url(../img/jq-global-nav.png) repeat-x 0 bottom #1b1b1b;
@@ -364,7 +369,7 @@ summary {
 }
 
 #canvas {
-    /* height: calc(100vh - 45px); */
+    /* height: calc(100vh - 115px); */
     height: 100vh;
     width: 100vw;
     background-color: rgb(238, 238, 238);
@@ -482,4 +487,7 @@ summary {
 }
 .until-btn {
     margin-top: 10px;
+}
+.info-modal-alert {
+    border-top: 1px solid #eeeeee;
 }

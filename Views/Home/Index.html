@@ -25,7 +25,7 @@
     <ul id="myTab" class="nav-menu">
         <li class="active">
             <a href="#home" data-toggle="tab">
-                wcs监控
+                设备监控
             </a>
         </li>
         <li>
@@ -36,6 +36,9 @@
         </li>
         <li>
             <a href="#div_config" tabindex="-1" data-toggle="tab">系统配置</a>
+        </li>
+        <li>
+            <a href="#taskManage" tabindex="-1" data-toggle="tab">任务管理</a>
         </li>
         <li>
             <a href="#div_help" tabindex="-1" data-toggle="tab">帮助文档</a>
@@ -49,23 +52,7 @@
             </div>
 
             <section id="homeVue">
-                <ul id="contextmenu" class="contextmenu" v-show="showContextmenu" :style="{left:contextmenuXY[0]+'px',top:contextmenuXY[1]+'px'}">
-                    <li>
-                        <a>修改信息</a>
-                    </li>
-                    <li>
-                        <a>一键清除</a>
-                    </li>
-                    <li>
-                        <a>一键申请</a>
-                    </li>
-                    <li>
-                        <a>正常排出</a>
-                    </li>
-                    <li>
-                        <a>异常排出</a>
-                    </li>
-                </ul>
+
                 <ul id="logindiv" style="display:none;">
                     <li>
                         <a>用户名</a>
@@ -84,95 +71,43 @@
 
                 <section class=" panel panel-default info-modal " v-show="showEquipmentinfo" :style="{left:equipmentinfoXY[0]+'px',top:equipmentinfoXY[1]+'px'}">
                     <div class="panel-heading">站台号</div>
-                    <div class="panel-body info-modal-content">
-                        <div>
-                            <h3>当前信息</h3>
-                            <ul class="modify-info">
-                                <li v-for="item in copyEquipmentinfo">
-                                    <span> {{item.title}}:</span>
-                                    <i>{{item.content}}</i>
-                                </li>
-                            </ul>
+                    <div class="panel-body ">
+                        <div class="info-modal-content">
+                            <div>
+                                <h3>当前信息</h3>
+                                <ul class="modify-info">
+                                    <li v-for="item in copyEquipmentinfo">
+                                        <span> {{item.title}}:</span>
+                                        <i>{{item.content}}</i>
+                                    </li>
+                                </ul>
+
+                            </div>
+                            <div style="width: 300px;">
+                                <h3>修改信息</h3>
+                                <ul class="modify-info">
+                                    <li v-for="item in equipmentinfo">
+                                        <span> {{item.title}}:</span>
+                                        <input type="text" class="form-control" v-model="item.content">
+                                    </li>
+                                </ul>
+
+                            </div>
+                            <div style="width: 120px">
+                                <h3>功能按钮</h3>
+                                <div>
+                                    <button class="btn btn-primary" @click="changeEquipmentinfo">确定修改</button>
+                                    <button class="btn btn-primary until-btn " v-for="item in equipmentinfo">一键清除</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="info-modal-alert">
                             <h5>设备报警</h5>
                             <div>无</div>
                         </div>
-                        <div style="width: 300px;">
-                            <h3>修改信息</h3>
-                            <ul class="modify-info">
-                                <li v-for="item in equipmentinfo">
-                                    <span> {{item.title}}:</span>
-                                    <input type="text" class="form-control" v-model="item.content">
-                                </li>
-                            </ul>
-                            <button class="btn btn-primary" @click="changeEquipmentinfo">确定修改</button>
-                        </div>
-                        <div style="width: 120px">
-                            <h3>功能按钮</h3>
-                            <div>
-
-                                <button class="btn btn-primary until-btn " v-for="item in equipmentinfo">一键清除</button>
-
-                            </div>
-                        </div>
                     </div>
+
                 </section>
-
-
-                <ul id="UpdateInfo" style="display:none;">
-                    <li>站台号
-                        <input id="sta_station" class="form-control" />
-                    </li>
-                    <li> 任务号
-                        <input id="sta_taskno" class="form-control" />
-                    </li>
-                    <li>货物类型
-                        <input id="sta_goodtype" class="form-control" />
-                    </li>
-                    <li>托盘条码
-                        <input id="sta_barcode" class="form-control" />
-                    </li>
-                    <li>起始地址
-                        <input id="sta_from" class="form-control" />
-                    </li>
-                    <li>目标地址
-                        <input id="sta_to" class="form-control" />
-                    </li>
-                    <li>
-                        <button id="write_okText" class="btn btn-primary">确定</button>
-                        <button id="write_cancelText" class="btn btn-default">取消</button>
-                        <span id="tcMsg" style="color: red; ">提示消息</span>
-                    </li>
-                </ul>
-                <ul id="equipmentinfoSC" style="display:none;">
-                    <li>
-                        <span id="span0">本机模式：</span>
-                    </li>
-                    ''
-                    <li>
-                        <span id="span1">wcs模式：</span>
-                    </li>
-                    <li>
-                        <span id="span2">任务号：</span>
-                    </li>
-                    <li>
-                        <span id="span3">起始地址：</span>
-                    </li>
-                    <li>
-                        <span id="span4">目标地址：</span>
-                    </li>
-                    <li>
-                        <span id="span5">当前行：</span>
-                    </li>
-                    <li>
-                        <span id="span6">当前列：</span>
-                    </li>
-                    <li>
-                        <span id="span7">当前层：</span>
-                    </li>
-                    <li>
-                        <span id="span8">当前层：</span>
-                    </li>
-                </ul>
             </section>
 
 
@@ -244,11 +179,42 @@
 
         </div>
         <!-- 配置界面结束 -->
-        <div class="tab-pane " id="div_help ">
+        <div class="tab-pane " id="div_help">
             <p>
                 帮助页面
             </p>
         </div>
+        <div class="tab-pane " id="taskManage"></div>
+        <table class="table">
+            <thead>
+                <th></th>
+                <th>WCS任务号</th>
+                <th>WMS任务号</th>
+                <th>执行设备 </th>
+                <th>起始地址</th>
+                <th>目标地址</th>
+                <th>任务类型</th>
+                <th>任务状态</th>
+                <th>执行状态</th>
+                <th>托盘号</th>
+                <th>区域名称 </th>
+                <th>创建时间</th>
+                <th>更新时间</th>
+            </thead>
+            <tbody>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tbody>
+        </table>
+    </div>
     </div>
     <script type="text/javascript " src="../../Scripts/jquery-1.10.2.min.js "></script>
     <script src="../../Scripts/bootstrap.min.js "></script>
