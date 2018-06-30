@@ -23,7 +23,7 @@
 
 <body>
     <ul id="myTab" class="nav-menu">
-        <li class="active">
+        <li>
             <a href="#home" data-toggle="tab">
                 设备监控
             </a>
@@ -31,54 +31,57 @@
         <li>
             <a href="#serverMonitor" data-toggle="tab">服务端监控</a>
         </li>
-        <li>
+        <li class="active" id="goodsMenu">
             <a href="#locationMonitor" data-toggle="tab">货位监控</a>
         </li>
         <li>
             <a href="#div_config" tabindex="-1" data-toggle="tab">系统配置</a>
         </li>
         <li>
-            <a href="#taskManage" tabindex="-1" data-toggle="tab">任务管理</a>
-        </li>
-        <li>
             <a href="#div_help" tabindex="-1" data-toggle="tab">帮助文档</a>
         </li>
     </ul>
-    <div id="myTabContent" class="tab-content">
-        <div class="tab-pane active" id="home">
 
+    <section id="commonVue">
+        <div class="login-btn" @click="showLoginDiv = true">
+            <button class="btn btn-primary"> 登录</button>
+        </div>
+
+        <ul id="logindiv" v-show="showLoginDiv">
+            <li>
+                <label>用户名</label>
+                <input id="loginName" class="form-control" v-model="username" />
+            </li>
+            <li>
+                <label>密码</label>
+                <input id="passWord" class="form-control" v-model="password" />
+            </li>
+            <li style="margin-top:20px;">
+                <button class="btn btn-primary" @click="login">确定</button>
+                <button class="btn btn-default" @click="showLoginDiv = false">取消</button>
+            </li>
+        </ul>
+    </section>
+
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane " id="home">
             <div id="content">
                 <canvas id="canvas"></canvas>
             </div>
-
             <section id="homeVue">
 
-                <ul id="logindiv" style="display:none;">
-                    <li>
-                        <a>用户名</a>
-                        <input id="loginName" class="form-control" />
-                    </li>
-                    <li>
-                        <a>密码</a>
-                        <input id="passWord" class="form-control" />
-                    </li>
-                    <li>
-                        <button id="login_okText" class="btn btn-primary">确定</button>
-                        <button id="login_cancelText" class="btn btn-default">取消</button>
-                    </li>
-                </ul>
 
 
                 <section class=" panel panel-default info-modal " v-show="showEquipmentinfo" :style="{left:equipmentinfoXY[0]+'px',top:equipmentinfoXY[1]+'px'}">
-                    <div class="panel-heading">站台号</div>
+                    <div class="panel-heading info-modal-title">站台号:{{stationData.DeviceID}}</div>
                     <div class="panel-body ">
                         <div class="info-modal-content">
                             <div>
                                 <h3>当前信息</h3>
                                 <ul class="modify-info">
-                                    <li v-for="item in copyEquipmentinfo">
-                                        <span> {{item.title}}:</span>
-                                        <i>{{item.content}}</i>
+                                    <li v-for="(val,key) in copyEquipmentinfo">
+                                        <span> {{key | en2zh}}:</span>
+                                        <i>{{val | other2zh(key)}}</i>
                                     </li>
                                 </ul>
 
@@ -86,18 +89,20 @@
                             <div style="width: 300px;">
                                 <h3>修改信息</h3>
                                 <ul class="modify-info">
-                                    <li v-for="item in equipmentinfo">
-                                        <span> {{item.title}}:</span>
-                                        <input type="text" class="form-control" v-model="item.content">
+                                    <li v-for="(val,key) in equipmentinfo">
+                                        <span> {{key | en2zh}}:</span>
+                                        <input type="text" class="form-control" v-model="equipmentinfo[key]" v-if="key !=='GoodsType' ">
+                                        <select class="form-control" v-else v-model="equipmentinfo[key]" style="width:160px">
+                                            <option :value="key" v-for="(val,key) in GOODSTYPE">{{val.name}}</option>
+                                        </select>
                                     </li>
                                 </ul>
 
                             </div>
-                            <div style="width: 120px">
+                            <div style="width: 243px">
                                 <h3>功能按钮</h3>
                                 <div>
-                                    <button class="btn btn-primary" @click="changeEquipmentinfo">确定修改</button>
-                                    <button class="btn btn-primary until-btn " v-for="item in equipmentinfo">一键清除</button>
+                                    <button class="btn btn-primary until-btn " v-for="item in stationButton" @click="actionButton(item)">{{item | button2zh}}</button>
                                 </div>
                             </div>
                         </div>
@@ -109,11 +114,6 @@
 
                 </section>
             </section>
-
-
-
-
-
 
         </div>
         <div class="tab-pane " id="serverMonitor">
@@ -132,88 +132,102 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane " id="locationMonitor">
-            <p>
-                显示货位监控
-            </p>
+        <div class="tab-pane active " id="locationMonitor">
+            <section class="goods-toolbar" id="goodsTool">
+                <button class="btn btn-primary" @click="zoomCenter">居中</button>
+                <button class="btn btn-primary" @click="zoomOut">放大</button>
+                <button class="btn btn-primary" @click="zoomIn">缩小</button>
+                <input type="text" v-model="keyword" class="form-control" style="width: 100px" placeholder="货架编号" />
+                <button @click="find" class="btn btn-primary">查询</button>
+
+                <select name="" id="" class="form-control" style="width: 100px">
+                    <option value="">区域</option>
+                    <option value="">高温浸润区</option>
+                    <option value="">常温静置区</option>
+                    <option value="">高温老化区</option>
+                </select>
+
+                <select name="" id="" class="form-control" style="width: 100px">
+                    <option value="">设备编号</option>
+                    <option value="">SC01</option>
+                    <option value="">SC02</option>
+                    <option value="">SC03</option>
+                </select>
+
+                <select name="" id="" class="form-control" style="width: 100px">
+                    <option value="">工艺名称</option>
+                    <option value="">高温浸润</option>
+                    <option value="">高温老化</option>
+                    <option value="">一次常温静置</option>
+                    <option value="">二次常温静置</option>
+                    <option value="">化成</option>
+                </select>
+
+                <section class=" panel panel-default info-modal " v-show="showModal" :style="{left:modalXY[0]+'px',top:modalXY[1]+'px'}">
+                    <div class="panel-heading">货位信息</div>
+                    <div class="panel-body ">
+
+                        <ul class="modify-info">
+                            <li v-for="(val,key) in infoData">
+                                <span>{{key | en2zh}}:</span> {{val}}
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+            <section class="config-b ">
+                <canvas id='goodsCanvas'></canvas>
+            </section>
         </div>
         <!-- 配置界面开始 -->
-        <div class="tab-pane " id="div_config">
-            <section class="config-t" id="configVue">
-                <ul class="img-list" id="createItem">
-                    <li data-type="convery-t" @click="createNode('convery-t')">
-                        <img src="../../Content/img/guntongHs.png" width="80px" alt="">
+        <div class="tab-pane" id='div_config'>
+            <section class="config-t " id='configVue'>
+                <ul class="img-list " id="createItem ">
+                    <li data-type="convery-t " @click="createNode( 'convery-t') ">
+                        <img src="../../Content/img/guntongHs.png " width="80px " alt=" ">
                     </li>
-                    <li data-type="convery-v" @click="createNode('convery-v')">
-                        <img src="../../Content/img/guntongSs.png" width="80px" alt="">
+                    <li data-type="convery-v " @click="createNode( 'convery-v') ">
+                        <img src="../../Content/img/guntongSs.png " width="80px " alt=" ">
                     </li>
-                    <li data-type="srm" @click="createNode('srm')">
-                        <img src="../../Content/img/sc.png" width="80px" alt="">
+                    <li data-type="srm " @click="createNode( 'srm') ">
+                        <img src="../../Content/img/sc.png " width="80px " alt=" ">
                     </li>
-                    <li data-type="robot" @click="createNode('robot')">
-                        <img src="../../Content/img/robot.png" width="80px" alt="">
+                    <li data-type="robot " @click="createNode( 'robot') ">
+                        <img src="../../Content/img/robot.png " width="80px " alt=" ">
                     </li>
                 </ul>
 
-                <button class="btn btn-primary" id="commitConfig" @click="commit">提交配置</button>
-                <!-- <div id="copyNode"></div> -->
-                <ul id="configContextmenu" class="contextmenu" v-show="contextmenu" :style="{left:contextmenuXY[0]+'px',top:contextmenuXY[1]+'px'}">
-                    <li class="input-group">
-                        <input type="text" class="form-control" style="width: 100px " placeholder="输入新命名" v-model="rename">
+                <button class="btn btn-primary " id="commitConfig " @click="commit ">提交配置</button>
+                <!-- <div id="copyNode "></div> -->
+                <ul id="configContextmenu " class="contextmenu " v-show="contextmenu " :style="{left:contextmenuXY[0]+
+                    'px',top:contextmenuXY[1]+ 'px'} ">
+                    <li class="input-group ">
+                        <input type="text " class="form-control " style="width: 100px " placeholder="输入新命名 " v-model="rename ">
                         <button class="btn btn-primary " @click="renameNode " style="margin-left:10px ">重命名</button>
                     </li>
                     <li class="input-group ">
                         <input type="number " class="form-control " style="width: 100px " placeholder="输入复制数量
-                        " v-model="cloneNum ">
+                    " v-model="cloneNum ">
                         <button class="btn btn-primary " @click="clone " style="margin-left:10px ">复制</button>
                     </li>
-                    <li @click="delNode">
+                    <li @click="delNode ">
                         删除
                     </li>
                 </ul>
             </section>
-            <section class="config-b">
-                <canvas id="configCanvas"></canvas>
+            <section class="config-b ">
+                <canvas id='configCanvas'></canvas>
             </section>
 
 
         </div>
         <!-- 配置界面结束 -->
-        <div class="tab-pane " id="div_help">
+        <div class="tab-pane" id="div_help">
             <p>
                 帮助页面
             </p>
         </div>
-        <div class="tab-pane " id="taskManage"></div>
-        <table class="table">
-            <thead>
-                <th></th>
-                <th>WCS任务号</th>
-                <th>WMS任务号</th>
-                <th>执行设备 </th>
-                <th>起始地址</th>
-                <th>目标地址</th>
-                <th>任务类型</th>
-                <th>任务状态</th>
-                <th>执行状态</th>
-                <th>托盘号</th>
-                <th>区域名称 </th>
-                <th>创建时间</th>
-                <th>更新时间</th>
-            </thead>
-            <tbody>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tbody>
-        </table>
+        <div class="tab-pane" id="taskManage "></div>
     </div>
     </div>
     <script type="text/javascript " src="../../Scripts/jquery-1.10.2.min.js "></script>
@@ -221,9 +235,13 @@
     <script src="../../Scripts/vue.dev2.0.js "></script>
     <script src="../../Scripts/jtopo-0.4.8-min.js "></script>
     <script src="../../Scripts/toolbar.js "></script>
-    <script src="../../Scripts/page/config.js/"></script>
+    <script src="../../Scripts/page/configjson.js "></script>
+    <script src="../../Scripts/page/config.js "></script>
     <script src="../../Scripts/page/setting.js "></script>
+    <script src="../../Scripts/page/goods.js "></script>
     <script src="../../Scripts/DrapJtopo.js "></script>
 </body>
+
+
 
 </html>

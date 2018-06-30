@@ -1,6 +1,6 @@
 ﻿const BACEIMGURL = '../../Content/img/';
-const SERVERURL = 'ws://192.16.9.2:9201';
-
+const SERVERURL = 'ws://192.16.9.3:9201';
+const wsMessageCallback = {};
 /**
  * 绘制输送机
  * @param {Object} item 绘制数据包
@@ -22,7 +22,6 @@ const crawConvery = function(item, i, stage) {
 
     if (nodes.length > 0) {
         var node = nodes[0];
-        console.log('你是打印node信息:' + node);
         //存在就更新1.任务号大于1000，读取原来的颜色进行比较更新
         if (item.Tags.TaskNum >= 1000) {
             if (item.DeviceID == item.Tags.ToStation) {
@@ -31,16 +30,7 @@ const crawConvery = function(item, i, stage) {
                 var stationType = '否';
             }
             var old_myType = node.myType;
-            console.log(
-                '是否申请：' +
-                    stationType +
-                    '，当前站台号：' +
-                    item.DeviceID +
-                    ',目标：' +
-                    item.Tags.ToStation +
-                    ',原来的颜色：' +
-                    old_myType
-            );
+
             if (stationType == '是') {
                 node.setImage(0);
                 node.fillColor = '251,143,27';
@@ -59,7 +49,6 @@ const crawConvery = function(item, i, stage) {
             node.setImage(0);
             node.setSize(50, 50);
             node.myType = 'black';
-            console.log('一键清除');
             if (item.Direction == 'T') {
                 if (item.Width == '1') {
                     node.setImage(BACEIMGURL + 'guntongHs.png');
@@ -147,9 +136,6 @@ const crawConvery = function(item, i, stage) {
             if (event.button == 2) {
                 // 右键
                 // 当前位置弹出菜单（div）
-
-                homeVue.showContextmenu = true;
-                homeVue.contextmenuXY = [event.pageX, event.pageY];
                 stationNo = event.target.text;
                 console.log('我是当前点击站台号:' + stationNo);
             }
@@ -254,14 +240,59 @@ const crawPutRobot = function(item) {
     scene.add(nodeRobot);
 };
 
-const until = {
-    loadImg(imgurl, callback) {
-        const img = new Image();
-        img.src = imgurl;
-        img.onload = function() {
-            callback(imgurl);
-        };
+/**
+ *
+ * @param {String} type  站台类型  STA/SRM
+ */
+const createPublicButton = function(stationData, config = STATIONBASEDATA) {
+    const data = config[stationData.deviceType].actionButton;
+
+    //Object.keys().filter(item)
+    const list = [];
+
+    //查找公共按钮
+    Object.keys(data).forEach(item => {
+        if (data[item].isPublic == 1) {
+            list.push(item);
+        }
+    });
+    return list;
+};
+
+/**
+ *
+ * @param {Object} stationData 站台信息
+ * @param {Object} config 配置项
+ */
+const createStationButton = function(stationData) {
+    return Object.keys(stationData.buttonData);
+};
+
+/**
+ * ws写入请求
+ * @param {WS} ws ws实例
+ * @param {Object} data 写入数据
+ * @param {Function} fn  回调函数
+ */
+const wsDoRequest = function(ws, data, fn = Null) {
+    var group = data;
+    const MessageID = scadaUntil.createTimeStamp();
+    var message = {
+        MessageID: MessageID,
+        Sender: 'test',
+        Receivcer: 'server1',
+        ZoneCode: 'gw',
+        UserID: userid,
+        PassWord: passwrd,
+        MesssageType: messagetype,
+        Data: group
+    };
+    console.log('写入数据', message);
+    if (fn) {
+        wsMessageCallback[MessageID] = fn;
     }
+
+    ws.send(JSON.stringify(message));
 };
 
 /**
@@ -271,16 +302,18 @@ const init = function() {
     //创建舞台
     var canvas = document.getElementById('canvas');
     const stage = new JTopo.Stage(canvas);
-    showJTopoToobar(stage); //显示工具栏
+    showJTopoToobar(stage, 'content'); //显示工具栏
 
     var scene = new JTopo.Scene(stage);
     stage.eagleEye.visible = true;
-    scene.setBackground(BACEIMGURL + 'bg.jpg');
-
+    //scene.setBackground(BACEIMGURL + 'bg.jpg');
+    scene.alpha = 1;
+    scene.backgroundColor = '49,90,119'; //49,90,119
     setCanvasWH(canvas);
     //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
 
     let wsDataArr = [];
+    let stationData = {}; // 单个站台信息
     // 舞台单击事件
     stage.click(function(event) {
         if (event.button == 0) {
@@ -299,54 +332,21 @@ const init = function() {
         console.log(e);
 
         const DeviceID = e.text;
-        let showData = [];
-        switch (e.text) {
-            case 'SC01':
-            case 'SC02':
-            case 'SC03':
-                showData = [
-                    { title: '设备号', content: '123' },
-                    { title: '设备状态', content: '123' },
-                    { title: '报警代码', content: '123' },
-                    { title: '堆垛机模式', content: '123' },
-                    { title: '手自动', content: '123' },
-                    { title: '工位1任务号', content: '123' }
-                ];
+        // todo: 从后台获取对应的数据 ,现在写死 STATIONS['1028']
+        stationData = STATIONS['1028'];
+        homeVue.stationData = stationData;
+        homeVue.publicButton = createPublicButton(stationData);
+        homeVue.stationButton = createStationButton(stationData);
 
-                break;
-            case 'RB01':
-            case 'RB02':
-                showData = [
-                    { title: '设备号', content: '234' },
-                    { title: '设备状态', content: '678' },
-                    { title: '报警代码', content: '789' },
-                    { title: '堆垛机模式', content: '111' },
-                    { title: '手自动', content: '12333' },
-                    { title: '工位1任务号', content: '34332' }
-                ];
-
-                break;
-            default:
-                wsDataArr.forEach(element => {
-                    console.log(DeviceID, element);
-
-                    if (DeviceID == element.DeviceID) {
-                        showData = [
-                            { title: '站台号', content: element.DeviceID },
-                            { title: '任务号', content: element.Tags.TaskNum },
-                            { title: '起始地址', content: element.Tags.FromStation },
-                            { title: '目标地址', content: element.Tags.ToStation },
-                            { title: '托盘条码', content: element.Tags.TrayCode },
-                            { title: '货物类型', content: element.Tags.GoodsType }
-                        ];
-                    }
-                });
-                break;
-        }
-        homeVue.equipmentinfo = showData;
-        homeVue.copyEquipmentinfo = JSON.parse(JSON.stringify(showData));
+        homeVue.equipmentinfo = stationData.infoData;
+        homeVue.copyEquipmentinfo = JSON.parse(JSON.stringify(stationData.infoData));
         homeVue.showEquipmentinfo = true;
-        homeVue.equipmentinfoXY = [event.pageX + 50, event.pageY - 100];
+        //homeVue.equipmentinfoXY = [event.pageX + 50, event.pageY - 100];
+        homeVue.equipmentinfoXY = [10, 10];
+    });
+
+    $('#loginBox').on('click', function() {
+        homeVue.showLoginDiv = true;
     });
 
     //连接服务端
@@ -370,9 +370,18 @@ const init = function() {
 
         const json = JSON.parse(e.data); //连接正式服务端时启用
         //var json = e.data;               //连接模拟服务端时启用
+        console.log(json);
         const dataArr = json.Data;
         wsDataArr = dataArr;
         console.log(dataArr);
+
+        if (wsMessageCallback[JSON.MessageID]) {
+            wsMessageCallback[JSON.MessageID]();
+            ws.send({
+                MessageID: JSON.MessageID,
+                MesssageType: 'stopPush'
+            });
+        }
 
         if (json.Sender == 'WCS') {
             switch (json.MesssageType) {
@@ -436,7 +445,7 @@ const init = function() {
 
     // 配置界面
     const settingConfig = scadaConfig(ws);
-
+    const goodConfig = goodsWatch();
     //初次连接服务端发送报文
     function checkUser(mestype, userName) {
         var login = [];
@@ -471,58 +480,6 @@ const init = function() {
         ws.send(JSON.stringify(group));
     });
 
-    //绘画节点
-    function drapNode(dataArr) {
-        $.each(dataArr, function(i) {
-            var nodeName = dataArr[i].STATION;
-            var nodeX = dataArr[i].X;
-            var nodeY = dataArr[i].Y;
-            console.log('收到drap！' + nodeName + '，X:' + nodeX + '，Y:' + nodeY);
-            drapNodeDetail(nodeName, 200, 300);
-        });
-    }
-
-    function drapNodeDetail(nodeName, nodeX, nodeY) {
-        var nodeTo = new JTopo.Node(nodeName);
-        nodeTo.setLocation(nodeX, nodeY);
-        scene.add(nodeTo);
-    }
-
-    //按钮事件：点击确认写入服务端站台信息
-    $('#write_okText').on('click', function() {
-        //$('#logindiv').css("display", "block");
-        var group = [];
-        userid = 'gw';
-        passwrd = '12345';
-        var messagetype = 'WriteSTA';
-        var stationno = $('#sta_station').val();
-        var task = $('#sta_taskno').val();
-        var from = $('#sta_from').val();
-        var to = $('#sta_to').val();
-        var goods = $('#sta_goodtype').val();
-        var barcode = $('#sta_barcode').val();
-        group.push({
-            DeviceCode: stationno,
-            TaskNum: task,
-            BarCode: barcode,
-            TrayType: goods,
-            FromStation: from,
-            ToStation: to
-        });
-        console.log(group);
-        var message = {
-            MessageID: '123',
-            Sender: 'test',
-            Receivcer: 'server1',
-            ZoneCode: 'gw',
-            UserID: userid,
-            PassWord: passwrd,
-            MesssageType: messagetype,
-            Data: group
-        };
-        console.log(message);
-        ws.send(JSON.stringify(message));
-    });
     //给后台写站台信息
     function writeInfo(mestype, userName) {
         var login = [];
@@ -546,11 +503,6 @@ const init = function() {
         ws.send(JSON.stringify(login));
     }
 
-    function getEquipmentInfo(equipmenttype, taskno) {
-        console.log(taskno);
-        $('#span0').text(taskno);
-    }
-
     //红色：237,19,12
     //绿色：48,187,35   浅绿：45,168,131
     //橘黄色：251,143,27
@@ -560,28 +512,100 @@ const init = function() {
     const homeVue = new Vue({
         el: '#homeVue',
         data: {
+            stationData: {},
             equipmentinfo: [],
             copyEquipmentinfo: [],
             showEquipmentinfo: false,
-            equipmentinfoXY: [0, 0]
+            equipmentinfoXY: [0, 0],
+
+            publicButton: [],
+            stationButton: [],
+
+            GOODSTYPE: GOODSTYPE
         },
         methods: {
-            changeEquipmentinfo() {}
-        },
-        filters: {
-            goodsType(type) {
-                let data = '';
+            changeEquipmentinfo() {},
+            actionButton(type) {
+                let wsData = {};
+                let fn = null;
                 switch (type) {
-                    case 1:
-                        data = '空物';
+                    case 'updateInfo':
+                        data = this.equipmentinfo;
+                        fn = function(res) {
+                            console.log(res);
+                        };
                         break;
-                    case 2:
-                        data = '实物';
+                    case 'delInfo':
+                        data = this.equipmentinfo;
+                        Object.keys(data).forEach(item => {
+                            if (item == 'GoodsType') {
+                                data[item] = 1;
+                            } else {
+                                data[item] = 0;
+                            }
+                        });
+
                         break;
-                    default:
+                    case 'getInfo':
+                        break;
+                    case 'normalRemove':
+                        let normalRemove = this.stationData.buttonData['normalRemove'];
+                        Object.keys(normalRemove).forEach(item => {
+                            this.equipmentinfo[item] = normalRemove[item];
+                        });
+                        data = this.equipmentinfo;
+                        fn = function() {};
+                        break;
+                    case 'abnormalRemove':
+                        let abnormalRemove = this.stationData.buttonData['abnormalRemove'];
+                        Object.keys(abnormalRemove).forEach(item => {
+                            this.equipmentinfo[item] = abnormalRemove[item];
+                        });
+                        data = this.equipmentinfo;
+                        fn = function() {};
                         break;
                 }
-                return data;
+                wsDoRequest(ws, data, fn);
+            }
+        },
+        filters: {
+            button2zh(name) {
+                if (stationData.deviceType) {
+                    return STATIONBASEDATA[stationData.deviceType].actionButton[name].name;
+                }
+                //return name;
+            },
+            en2zh(name) {
+                return EN2EH[name] ? EN2EH[name] : name;
+            },
+            other2zh(val, name) {
+                let n = val;
+                switch (name) {
+                    case 'GoodsType':
+                        n = GOODSTYPE[val].name;
+
+                        break;
+                }
+                return n;
+            }
+        }
+    });
+
+    const commonVue = new Vue({
+        el: '#commonVue',
+        data: {
+            showLoginDiv: false,
+            password: '',
+            username: ''
+        },
+        methods: {
+            login: function() {
+                var group = [];
+                const messagetype = 'checkUser';
+
+                group.push({ messagetype: messagetype, userid: this.username, password: this.password });
+
+                ws.send(JSON.stringify(group));
             }
         }
     });
@@ -614,5 +638,3 @@ function dofilter(element, index, array) {
     return true;
 }
 var filtered = arrs.filter(dofilter);
-console.log('我是原始数组测试：' + JSON.stringify(arrs));
-console.log('我是过滤数组测试：' + JSON.stringify(filtered));

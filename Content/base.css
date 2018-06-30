@@ -236,19 +236,6 @@ h2 {
     clear: both;
 }
 
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-nav,
-section,
-summary {
-    display: block;
-}
 .content .hentry {
     padding: 10px 20px;
     margin: 15px 0;
@@ -281,8 +268,15 @@ summary {
     text-decoration: none;
 }
 
+.login-btn {
+    position: absolute;
+    right: 10px;
+    top: 18px;
+}
+
 /* 工具栏 */
 .jtopo_toolbar {
+    display: flex;
     box-sizing: border-box;
     padding-left: 20px;
     background-color: rgb(216, 231, 242);
@@ -291,7 +285,9 @@ summary {
     padding-top: 7px;
     padding-bottom: 10px;
 }
-
+.jtopo_toolbar input {
+    margin-left: 5px;
+}
 .contextmenu {
     border: 1px solid #aaa;
     border-bottom: 0;
@@ -313,14 +309,15 @@ summary {
 }
 
 #logindiv {
+    position: absolute;
+    left: 50%;
+    top: 100px;
     border: 1px solid #aaa;
     border-bottom: 0;
     background: #eee;
-    position: absolute;
     list-style: none;
-    margin: 0;
-    padding: 0;
-    display: none;
+    margin-left: -125px;
+    padding: 20px;
 }
 
 #logindiv li a {
@@ -486,8 +483,28 @@ summary {
     width: 160px;
 }
 .until-btn {
-    margin-top: 10px;
+    margin: 5px;
 }
 .info-modal-alert {
     border-top: 1px solid #eeeeee;
+}
+.info-modal-title {
+    font-size: 20px;
+    text-align: center;
+}
+
+/* 货位监控 */
+#goodsCanvas {
+    height: 100vh;
+    width: 100vw;
+}
+.goods-toolbar {
+    display: flex;
+    padding: 20px;
+}
+.goods-toolbar button {
+    margin: 0 5px;
+}
+.goods-toolbar select {
+    margin: 0 5px;
 }

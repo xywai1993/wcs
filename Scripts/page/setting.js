@@ -2,17 +2,6 @@
  *  yiper.fan 学不进  2018.6.22
  */
 
-/**a
- * 设置canvas宽高
- * @param {DOMNode} c
- */
-const setCanvasWH = function(c) {
-    const width_Pscreen = $(window).width(); //获取父级窗口的宽度
-    const heigth_Pscreen = $(window).height();
-    $(c).attr('width', $(window).get(0).innerWidth);
-    $(c).attr('height', $(window).get(0).innerHeight);
-};
-
 //初始编号
 
 const scadaConfig = function(ws) {
@@ -35,7 +24,9 @@ const scadaConfig = function(ws) {
     setCanvasWH(canvas);
     const stage = new JTopo.Stage(canvas);
     const scene = new JTopo.Scene(stage);
-    scene.setBackground(IMGSRC.bg);
+    //scene.setBackground(IMGSRC.bg);
+    scene.alpha = 1;
+    scene.backgroundColor = '49,90,119'; //49,90,119
     //stage.wheelZoom = 0.85;
 
     let createNodeIndex = 1;

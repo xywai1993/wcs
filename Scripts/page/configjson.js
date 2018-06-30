@@ -60,16 +60,16 @@ const STATIONBASEDATA = {
             }
         },
         goodsType: {
-            "1": {
+            '1': {
                 name: '空托盘'
             },
-            "2": {
+            '2': {
                 name: '实托盘'
             },
-            "3": {
+            '3': {
                 name: '复测托盘'
             },
-            "4": {
+            '4': {
                 name: '异常托盘'
             }
         }
@@ -100,7 +100,7 @@ const STATIONBASEDATA = {
             },
             '5': {
                 name: '消防任务'
-            },
+            }
         },
         urlButton: {
             wcsLink: {
@@ -120,8 +120,7 @@ const STATIONBASEDATA = {
             }
         }
     }
-}
-
+};
 
 const ACTIONBUTTON = {
     updateInfo: {
@@ -164,7 +163,7 @@ const ACTIONBUTTON = {
         name: '常温2入库',
         isPublic: 0
     }
-}
+};
 
 const URLBUTTON = {
     wcsLink: {
@@ -182,24 +181,63 @@ const URLBUTTON = {
         isPublic: 0,
         url: ''
     }
-}
+};
 
 const GOODSTYPE = {
-    "1": {
-        name: '空托盘'
+    '1': {
+        name: '空托盘(1)'
     },
-    "2": {
-        name: '实托盘'
+    '2': {
+        name: '实托盘(2)'
     },
-    "3": {
-        name: '复测托盘'
+    '3': {
+        name: '复测托盘(3)'
     },
-    "4": {
-        name: '异常托盘'
+    '4': {
+        name: '异常托盘(4)'
     }
-}
+};
 
-const STATIONS= {
+const EN2EH = {
+    DeviceID: '站台号',
+    TaskNum: '任务号',
+    FromStation: '起始地址',
+    ToStation: '目标地址',
+    TrayCode: '托盘条码',
+    GoodsType: '货物类型'
+};
+
+const STATIONS = {
+    '1028': {
+        deviceType: 'STA',
+        DeviceID: '1028',
+        warm: '',
+        infoData: {
+            TaskNum: '1',
+            FromStation: '1',
+            ToStation: '1',
+            TrayCode: '1',
+            GoodsType: '1'
+        },
+        buttonData: {
+            updateInfo: {},
+            delInfo: {
+                TaskNum: 0,
+                FromStation: 0,
+                ToStation: 0,
+                TrayCode: 0,
+                GoodsType: 0
+            },
+            getInfo: {},
+            normalRemove: {
+                ToStation: '2022'
+            },
+            abnormalRemove: {
+                GoodsType: '4',
+                ToStation: '2022'
+            }
+        }
+    },
     '2002': {
         button: ['normalRemove', 'abnormalRemove'],
         data: {
@@ -212,4 +250,9 @@ const STATIONS= {
             }
         }
     }
+};
+
+// 货位状态
+const LOCATIONSTATE = {
+    A_empty_Empty: 'A类'
 };
