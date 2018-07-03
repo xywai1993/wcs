@@ -184,6 +184,9 @@ const URLBUTTON = {
 };
 
 const GOODSTYPE = {
+    '0': {
+        name: '无'
+    },
     '1': {
         name: '空托盘(1)'
     },
@@ -208,18 +211,18 @@ const EN2EH = {
 };
 
 const STATIONS = {
-    '1028': {
+    '2018': {
         deviceType: 'STA',
         DeviceID: '1028',
         warm: '',
-        infoData: {
+        InfoData: {
             TaskNum: '1',
             FromStation: '1',
             ToStation: '1',
             TrayCode: '1',
             GoodsType: '1'
         },
-        buttonData: {
+        ButtonData: {
             updateInfo: {},
             delInfo: {
                 TaskNum: 0,

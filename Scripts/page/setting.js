@@ -7,8 +7,16 @@
 const scadaConfig = function(ws) {
     const BACEIMGURL = '../../Content/img/';
     const IMGSRC = {
-        'convery-t': BACEIMGURL + 'guntongHs.png',
-        'convery-v': BACEIMGURL + 'guntongSs.png',
+        'convery-t': BACEIMGURL + 'top-bottom.png',
+        'convery-v': BACEIMGURL + 'left-right.png',
+        'convery-t-t': BACEIMGURL + 'top.png',
+        'convery-v-l': BACEIMGURL + 'left.png',
+        'left-right': BACEIMGURL + 'left-right.png',
+        right: BACEIMGURL + 'right.png',
+        left: BACEIMGURL + 'left.png',
+        'top-bottom': BACEIMGURL + 'top-bottom.png',
+        top: BACEIMGURL + 'top.png',
+        bottom: BACEIMGURL + 'bottom.png',
         srm: BACEIMGURL + 'sc.png',
         robot: BACEIMGURL + 'robot.png',
         bg: BACEIMGURL + 'bg.jpg'
@@ -24,10 +32,10 @@ const scadaConfig = function(ws) {
     setCanvasWH(canvas);
     const stage = new JTopo.Stage(canvas);
     const scene = new JTopo.Scene(stage);
-    //scene.setBackground(IMGSRC.bg);
-    scene.alpha = 1;
-    scene.backgroundColor = '49,90,119'; //49,90,119
-    //stage.wheelZoom = 0.85;
+    scene.setBackground(IMGSRC.bg);
+    // scene.alpha = 1;
+    // scene.backgroundColor = '49,90,119'; //49,90,119
+    stage.wheelZoom = 0.85;
 
     let createNodeIndex = 1;
     let startCopy = false;
@@ -57,14 +65,17 @@ const scadaConfig = function(ws) {
      * @param {Number} x  节点坐标
      * @param {Number} y  节点坐标
      */
-    const createNode = function(type, x, y) {
+    const createNode = function(type, x, y, dir) {
         const node = new JTopo.Node(createNodeIndex);
         switch (type) {
+            //V 水平，T 垂直
             case 'convery-t':
                 node.direction = 'T';
+                node.dir = dir || 'top-bottom';
                 break;
             case 'convery-v':
                 node.direction = 'V';
+                node.dir = dir || 'left-right';
                 break;
             case 'srm':
                 break;
@@ -74,9 +85,15 @@ const scadaConfig = function(ws) {
                 break;
         }
         node.devType = type;
-        node.font = '16px';
+        node.font = '16px Consolas';
+        node.fontColor = '255,255,35';
         node.textPosition = 'Middle_Center';
-        node.setImage(IMGSRC[type]);
+        if (dir) {
+            node.setImage(IMGSRC[dir]);
+        } else {
+            node.setImage(IMGSRC[type]);
+        }
+
         node.setSize(BACEWHPX, BACEWHPX);
         createNodeIndex++;
         //node.setLocation(-11, -6);
@@ -140,18 +157,13 @@ const scadaConfig = function(ws) {
             };
         });
 
-        const reqData = {
-            MessageID: scadaUntil.createTimeStamp(),
-            Sender: 'WCS',
-            Receivcer: 'WMS',
-            ZoneCode: '553EFD8264E94FCC8F355A58C0808419',
-            MesssageType: 'SystemConfig',
-            UserID: null,
-            Password: null,
-            data: data
-        };
-        console.log(reqData);
-        ws.send(reqData);
+        wsRequest({
+            messagetype: 'SystemConfig',
+            data: data,
+            function(data) {
+                console.log('提交配置后的回调');
+            }
+        });
     };
 
     /**
@@ -168,12 +180,37 @@ const scadaConfig = function(ws) {
         new Array(Number(num)).fill(1).forEach((item, i) => {
             console.log(i);
             if (currentNode.direction == 'T') {
-                createNode(createType, x + BACEWHPX, y + (i + 2) * BACEWHPX);
+                createNode(createType, x + BACEWHPX, y + (i + 2) * BACEWHPX, currentNode.dir);
             } else {
-                createNode(createType, x + (i + 2) * BACEWHPX, y + BACEWHPX);
+                createNode(createType, x + (i + 2) * BACEWHPX, y + BACEWHPX, currentNode.dir);
             }
         });
         console.log(currentNode);
+    };
+
+    const changeDir = function() {
+        const t = ['top', 'bottom', 'top-bottom'];
+        const v = ['left', 'right', 'left-right'];
+
+        if (currentNode.direction == 'V') {
+            nextDir(v);
+        }
+        if (currentNode.direction == 'T') {
+            nextDir(t);
+        }
+
+        function nextDir(arr) {
+            let i = arr.indexOf(currentNode.dir);
+            if (i == arr.length - 1) {
+                i = 0;
+                currentNode.dir = arr[0];
+            } else {
+                i++;
+                currentNode.dir = arr[i];
+            }
+            currentNode.setImage(IMGSRC[currentNode.dir]);
+            console.log(currentNode.dir);
+        }
     };
 
     /**
@@ -212,6 +249,9 @@ const scadaConfig = function(ws) {
             },
             clone() {
                 cloneNode(this.cloneNum);
+            },
+            changeDir() {
+                changeDir();
             },
             commit() {
                 commit();

@@ -6,7 +6,7 @@
     <title>scada</title>
 
     <link rel="stylesheet" type="text/css" href="../../Content/base.css">
-    <link rel="stylesheet" href="../../Content/bootstrap.css">
+    <link rel="stylesheet" href="../../Content/bootstrap.min.css">
     <link href="../../Content/jquery.snippet.min.css" rel="stylesheet">
     <style>
         canvas {
@@ -23,7 +23,7 @@
 
 <body>
     <ul id="myTab" class="nav-menu">
-        <li>
+        <li class="active">
             <a href="#home" data-toggle="tab">
                 设备监控
             </a>
@@ -31,7 +31,7 @@
         <li>
             <a href="#serverMonitor" data-toggle="tab">服务端监控</a>
         </li>
-        <li class="active" id="goodsMenu">
+        <li id="goodsMenu">
             <a href="#locationMonitor" data-toggle="tab">货位监控</a>
         </li>
         <li>
@@ -46,32 +46,40 @@
         <div class="login-btn" @click="showLoginDiv = true">
             <button class="btn btn-primary"> 登录</button>
         </div>
+        <div class="hide-menu-btn" @click="showMenu = !showMenu">
+            <button class="btn btn-primary">{{showMenu?'隐藏菜单':'展开菜单'}} </button>
+        </div>
+        <section class=" panel panel-default " id="logindiv" v-show="showLoginDiv">
+            <div class="panel-heading info-modal-title">登录</div>
+            <div class="panel-body ">
+                <ul>
+                    <li>
+                        <label>用户名</label>
+                        <input id="loginName" class="form-control" v-model="username" />
+                    </li>
+                    <li>
+                        <label>密码</label>
+                        <input id="passWord" class="form-control" v-model="password" />
+                    </li>
+                    <li style="margin-top:20px;">
+                        <button class="btn btn-primary" @click="login">确定</button>
+                        <button class="btn btn-default" @click="showLoginDiv = false">取消</button>
+                    </li>
+                </ul>
+            </div>
+        </section>
 
-        <ul id="logindiv" v-show="showLoginDiv">
-            <li>
-                <label>用户名</label>
-                <input id="loginName" class="form-control" v-model="username" />
-            </li>
-            <li>
-                <label>密码</label>
-                <input id="passWord" class="form-control" v-model="password" />
-            </li>
-            <li style="margin-top:20px;">
-                <button class="btn btn-primary" @click="login">确定</button>
-                <button class="btn btn-default" @click="showLoginDiv = false">取消</button>
-            </li>
-        </ul>
     </section>
 
+
+
+
     <div id="myTabContent" class="tab-content">
-        <div class="tab-pane " id="home">
+        <div class="tab-pane active " id="home">
             <div id="content">
                 <canvas id="canvas"></canvas>
             </div>
             <section id="homeVue">
-
-
-
                 <section class=" panel panel-default info-modal " v-show="showEquipmentinfo" :style="{left:equipmentinfoXY[0]+'px',top:equipmentinfoXY[1]+'px'}">
                     <div class="panel-heading info-modal-title">站台号:{{stationData.DeviceID}}</div>
                     <div class="panel-body ">
@@ -108,16 +116,15 @@
                         </div>
                         <div class="info-modal-alert">
                             <h5>设备报警</h5>
-                            <div>无</div>
+                            <div>{{stationData.Warm}}</div>
                         </div>
                     </div>
-
                 </section>
             </section>
 
         </div>
         <div class="tab-pane " id="serverMonitor">
-            <canvas id="canvasServer" style="background-color: rgb(238, 238, 238); border: 1px solid rgb(68, 68, 68); cursor: default;"></canvas>
+            <canvas id="canvasServer" style="cursor: default;"></canvas>
             <div class="snippet-container" style="margin-top:3px;;">
                 <div class="sh_acid snippet-wrap" style="display: none;">
                     <div class="snippet-menu sh_sourceCode" style="display:none;">
@@ -132,14 +139,14 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane active " id="locationMonitor">
+        <div class="tab-pane  " id="locationMonitor">
             <section class="goods-toolbar" id="goodsTool">
                 <button class="btn btn-primary" @click="zoomCenter">居中</button>
                 <button class="btn btn-primary" @click="zoomOut">放大</button>
                 <button class="btn btn-primary" @click="zoomIn">缩小</button>
                 <input type="text" v-model="keyword" class="form-control" style="width: 100px" placeholder="货架编号" />
                 <button @click="find" class="btn btn-primary">查询</button>
-
+                <div style="height: 40px;border-right: 1px solid #eeeeee"></div>
                 <select name="" id="" class="form-control" style="width: 100px">
                     <option value="">区域</option>
                     <option value="">高温浸润区</option>
@@ -162,16 +169,23 @@
                     <option value="">二次常温静置</option>
                     <option value="">化成</option>
                 </select>
-
+                <button class="btn btn-primary">切换</button>
                 <section class=" panel panel-default info-modal " v-show="showModal" :style="{left:modalXY[0]+'px',top:modalXY[1]+'px'}">
                     <div class="panel-heading">货位信息</div>
                     <div class="panel-body ">
+                        <div class="info-modal-content">
+                            <div>
+                                <ul class="modify-info">
+                                    <li v-for="(val,key) in infoData">
+                                        <span>{{key | en2zh}}:</span> {{val}}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                按钮信息
+                            </div>
+                        </div>
 
-                        <ul class="modify-info">
-                            <li v-for="(val,key) in infoData">
-                                <span>{{key | en2zh}}:</span> {{val}}
-                            </li>
-                        </ul>
                     </div>
                 </section>
             </section>
@@ -203,14 +217,17 @@
                     'px',top:contextmenuXY[1]+ 'px'} ">
                     <li class="input-group ">
                         <input type="text " class="form-control " style="width: 100px " placeholder="输入新命名 " v-model="rename ">
-                        <button class="btn btn-primary " @click="renameNode " style="margin-left:10px ">重命名</button>
+                        <button class="btn btn-primary " @click="renameNode " style="margin-left:10px">重命名</button>
                     </li>
                     <li class="input-group ">
-                        <input type="number " class="form-control " style="width: 100px " placeholder="输入复制数量
+                        <input type="number " class="form-control " style="width: 100px" placeholder="输入复制数量
                     " v-model="cloneNum ">
-                        <button class="btn btn-primary " @click="clone " style="margin-left:10px ">复制</button>
+                        <button class="btn btn-primary" @click="clone" style="margin-left:10px">复制</button>
                     </li>
-                    <li @click="delNode ">
+                    <li @click="changeDir">
+                        切换方向
+                    </li>
+                    <li @click="delNode">
                         删除
                     </li>
                 </ul>
@@ -218,7 +235,6 @@
             <section class="config-b ">
                 <canvas id='configCanvas'></canvas>
             </section>
-
 
         </div>
         <!-- 配置界面结束 -->
@@ -240,6 +256,7 @@
     <script src="../../Scripts/page/setting.js "></script>
     <script src="../../Scripts/page/goods.js "></script>
     <script src="../../Scripts/DrapJtopo.js "></script>
+    <script src="../../Scripts/page/main.js"></script>
 </body>
 
 

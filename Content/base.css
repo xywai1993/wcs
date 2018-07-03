@@ -1,7 +1,13 @@
 ﻿body {
     overflow: scroll;
 }
-
+ul,
+li {
+    list-style: none;
+}
+ul {
+    padding: 0;
+}
 /* 页眉、页脚-- 开始*/
 
 #global-nav {
@@ -271,7 +277,12 @@ h2 {
 .login-btn {
     position: absolute;
     right: 10px;
-    top: 18px;
+    top: 0;
+}
+.hide-menu-btn {
+    position: absolute;
+    right: 80px;
+    top: 0;
 }
 
 /* 工具栏 */
@@ -311,13 +322,9 @@ h2 {
 #logindiv {
     position: absolute;
     left: 50%;
-    top: 100px;
-    border: 1px solid #aaa;
-    border-bottom: 0;
-    background: #eee;
-    list-style: none;
-    margin-left: -125px;
-    padding: 20px;
+    top: 200px;
+    width: 400px;
+    margin-left: -200px;
 }
 
 #logindiv li a {
@@ -500,6 +507,7 @@ h2 {
 }
 .goods-toolbar {
     display: flex;
+    align-items: center;
     padding: 20px;
 }
 .goods-toolbar button {

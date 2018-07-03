@@ -1,12 +1,12 @@
 const BACEWHPX = 80;
-
+const SHOWMENU = false;
 const scadaUntil = {
     /**
      * 创建时间戳
      */
     createTimeStamp() {
         const date = new Date();
-        return date.getTime();
+        return date.getTime() + Math.random() * 1000;
     }
 };
 

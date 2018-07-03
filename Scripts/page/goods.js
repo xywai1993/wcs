@@ -7,13 +7,14 @@
  */
 
 const goodsWatch = function(ws) {
-    const BACEIMGURL = '../../Content/img/';
+    const cerateImgUrl = name => {
+        return '../../Content/locationImg/' + name;
+    };
     const IMGSRC = {
-        'convery-t': BACEIMGURL + 'guntongHs.png',
-        'convery-v': BACEIMGURL + 'guntongSs.png',
-        srm: BACEIMGURL + 'sc.png',
-        robot: BACEIMGURL + 'robot.png',
-        bg: BACEIMGURL + 'bg.jpg'
+        '0': cerateImgUrl('0.PNG'),
+        A_0_stop: cerateImgUrl('a0st.PNG'),
+        A_0_start: cerateImgUrl('a1sp.PNG'),
+        A_1_start: cerateImgUrl('a1st.PNG')
     };
     const DEVICETYPE = {
         'convery-t': 'Convery',
@@ -102,7 +103,7 @@ const goodsWatch = function(ws) {
         LOCATIONLINE: '2' // 深
     };
 
-    const createGoods = function(abs, col, row, box) {
+    const createGoods = function(abs, col, row, box, flag) {
         // 没】每列 每行 起始坐标
         const x = (parseInt(col, 10) - 1) * (PX.col + PX.width * 2 + PX.box);
         const y = (parseInt(row, 10) - 1) * (-PX.row - PX.width);
@@ -115,7 +116,7 @@ const goodsWatch = function(ws) {
         node.fillColor = '0,0,0,0';
         node.font = '12px';
         node.textPosition = 'Middle_Center';
-        node.setImage('../../Content/locationImg/a0.PNG');
+        node.setImage(IMGSRC[flag]);
         node.setSize(PX.width, PX.width);
         node.dragable = false;
 
@@ -128,20 +129,17 @@ const goodsWatch = function(ws) {
         scene.add(node);
     };
 
-    for (let abs = 1; abs <= aa.LOCATIONDEPTH; abs++) {
-        for (let col = 1; col <= aa.LOCATIONCOLUMN; col++) {
-            for (let row = 1; row <= aa.LOCATIONLAYER; row++) {
-                for (let box = 1; box <= aa.LOCATIONLINE; box++) {
-                    createGoods(abs, col, row, box);
-                }
-            }
-        }
-    }
+    const createAll = function(data) {
+        data.Data.forEach(aa => {
+            createGoods(aa.LOCATIONDEPTH, aa.LOCATIONCOLUMN, aa.LOCATIONLAYER, aa.LOCATIONLINE, aa.LOCATIONFLAG);
+        });
+    };
 
     new Array(30).fill(1).forEach((item, i) => {
         const node = new JTopo.Node(`${i}`);
         const node2 = new JTopo.Node(`${i}`);
         const node3 = new JTopo.Node(`${i}`);
+
         node.font = '12px';
         node.textPosition = 'Middle_Center';
         //node.setImage(IMGSRC[type]);
@@ -178,10 +176,11 @@ const goodsWatch = function(ws) {
 
         scene.add(node);
         scene.add(node2);
-        scene.add(node3);
-    });
 
-    // //缩放并居中显示
+        if (i <= 15) {
+            scene.add(node3);
+        }
+    });
 
     const goodsVue = new Vue({
         el: '#goodsTool',
@@ -251,5 +250,10 @@ const goodsWatch = function(ws) {
         }
     });
 
+    $('#goodsMenu').on('click', function() {
+        wsRequest({ messagetype: 'getLocation' }, function(data) {
+            createAll(data);
+        });
+    });
     return {};
 };

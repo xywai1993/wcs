@@ -1,44 +1,79 @@
 const SERVERURL = 'ws://192.16.9.2:9201';
 const ws = new WebSocket(SERVERURL); //实例化WebSocket对象
+const wsMessageCallback = {};
+
+let createDeviceFn = null;
+const wsRequest = function(obj, fn = null) {
+    const MessageID = scadaUntil.createTimeStamp();
+    if (fn) {
+        wsMessageCallback[MessageID] = fn;
+    }
+    var message = {
+        MessageID: MessageID,
+        Sender: 'test',
+        Receivcer: 'server1',
+        ZoneCode: 'gw',
+        MessageType: obj.messagetype,
+        Data: obj.data || {}
+    };
+    console.log('请求type：' + obj.messagetype);
+    console.log(message);
+    try {
+        ws.send(JSON.stringify([message]));
+    } catch (error) {
+        alert('服务器出错，请重试');
+        console.log('WS错误');
+    }
+};
+
 ws.onopen = function(e) {
     console.log('开始连接！');
-    checkUser('Login', userName);
+    //checkUser('Login', userName);
+
+    wsRequest(
+        {
+            messagetype: 'Login',
+            data: {
+                UserID: 'userid',
+                PassWord: 'passwrd'
+            }
+        },
+        function() {
+            console.log('登陆请求回调运行成功');
+        }
+    );
+
+    //设备监控
+    createDeviceFn = deviceWatch(ws);
+    // 配置界面
+    scadaConfig(ws);
+    //货架
+    goodsWatch(ws);
 };
 
 // 处理服务端返回的数据
 ws.onmessage = function(e) {
-    console.log('连接成功！');
-
     const json = JSON.parse(e.data); //连接正式服务端时启用
     //var json = e.data;               //连接模拟服务端时启用
     const dataArr = json.Data;
+    wsDataArr = dataArr;
+    //console.log(dataArr);
+    console.log('数据来了:', json);
+    if (wsMessageCallback[json.MessageID]) {
+        wsMessageCallback[json.MessageID](json);
+        // ws.send({
+        //     MessageID: json.MessageID,
+        //     MesssageType: 'stopPush'
+        // });
+    }
 
     if (json.Sender == 'WCS') {
-        switch (json.MesssageType) {
+        switch (json.MessageType) {
             case 'Init':
-                dataArr.forEach((item, i) => {
-                    switch (item.DeviceType) {
-                        case 'Convery':
-                            //绘制输送机
-                            crawConvery(item, i, stage);
-                            break;
-                        case 'SRM':
-                            //收到堆垛机数据
-                            crawSRM(item, i, stage);
-                            break;
-                        case 'PutRobot':
-                            //绘制机械手
-                            crawPutRobot(item, i, stage);
-                            break;
-                        default:
-                            console.log('未知的DeviceType');
-                            break;
-                    }
-                });
+                createDeviceFn(json.Data);
                 break;
             case 'checkMesg':
                 //用户权限验证反馈
-                console.log('我是数据' + json.message);
                 if (json.message == 1) {
                     console.log('我是用户验证成功');
                     $('#tcMsg').text('用户权限验证成功');
@@ -51,14 +86,7 @@ ws.onmessage = function(e) {
                 break;
             case 'Response':
                 //服务端信息反馈
-                console.log('我是进入回复');
-                console.log('22:' + dataArr.Code);
-                if (dataArr.Code == '666') {
-                    console.log('我是进入循环');
-                    $('#tcMsg').text(dataArr.Msg);
-                } else {
-                    $('#tcMsg').text(dataArr.Msg);
-                }
+
                 break;
             case 'serverMonitor':
                 //服务端数据监控
@@ -67,8 +95,39 @@ ws.onmessage = function(e) {
                 //服务端数据监控
                 break;
             default:
-                console.log('未知的MesssageType');
+                console.log('未知的MesssageType:' + json.MesssageType, json);
                 break;
         }
     }
 };
+
+const commonVue = new Vue({
+    el: '#commonVue',
+    data: {
+        showLoginDiv: false,
+        showMenu: true,
+        password: '',
+        username: ''
+    },
+    methods: {
+        login: function() {
+            var group = [];
+            const messagetype = 'checkUser';
+
+            wsRequest({
+                ws: ws,
+                messagetype: 'checkUser',
+                data: { userid: this.username, password: this.password }
+            });
+        }
+    },
+    watch: {
+        showMenu(val) {
+            if (!val) {
+                $('#myTab').hide();
+            } else {
+                $('#myTab').show();
+            }
+        }
+    }
+});
