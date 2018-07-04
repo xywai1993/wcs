@@ -1,4 +1,4 @@
-const SERVERURL = 'ws://192.16.9.2:9201';
+const SERVERURL = 'ws://192.16.9.3:9201';
 const ws = new WebSocket(SERVERURL); //实例化WebSocket对象
 const wsMessageCallback = {};
 
@@ -95,7 +95,7 @@ ws.onmessage = function(e) {
                 //服务端数据监控
                 break;
             default:
-                console.log('未知的MesssageType:' + json.MesssageType, json);
+                console.log('未知的MessageType:' + json.MessageType, json);
                 break;
         }
     }

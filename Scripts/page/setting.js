@@ -42,7 +42,6 @@ const scadaConfig = function(ws) {
     let currentNode = null;
     const $copyNode = $('#copyNode');
     const $contextmenu = $('#configContextmenu');
-    let createType = '';
 
     //
     stage.click(function(e) {
@@ -88,6 +87,7 @@ const scadaConfig = function(ws) {
         node.font = '16px Consolas';
         node.fontColor = '255,255,35';
         node.textPosition = 'Middle_Center';
+
         if (dir) {
             node.setImage(IMGSRC[dir]);
         } else {
@@ -180,9 +180,9 @@ const scadaConfig = function(ws) {
         new Array(Number(num)).fill(1).forEach((item, i) => {
             console.log(i);
             if (currentNode.direction == 'T') {
-                createNode(createType, x + BACEWHPX, y + (i + 2) * BACEWHPX, currentNode.dir);
+                createNode('convery-t', x + BACEWHPX, y + (i + 2) * BACEWHPX, currentNode.dir);
             } else {
-                createNode(createType, x + (i + 2) * BACEWHPX, y + BACEWHPX, currentNode.dir);
+                createNode('convery-v', x + (i + 2) * BACEWHPX, y + BACEWHPX, currentNode.dir);
             }
         });
         console.log(currentNode);
@@ -237,7 +237,6 @@ const scadaConfig = function(ws) {
         },
         methods: {
             createNode(type) {
-                createType = type;
                 createNode(type, 100, 100);
             },
             renameNode() {

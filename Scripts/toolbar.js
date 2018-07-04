@@ -7,7 +7,10 @@ function showJTopoToobar(stage, id) {
             '<input type="button" id="zoomOutButton"  class="btn btn-primary" value=" 放 大 " />' +
             '<input type="button" id="zoomInButton"  class="btn btn-primary" value=" 缩 小 " />' +
             '&nbsp;&nbsp;<input type="text" id="findText" style="width: 100px;" class="form-control" value="" onkeydown="enterPressHandler(event)">' +
-            '<input type="button" id="findButton" class="btn btn-primary" value=" 查 询 ">'
+            '<input type="button" id="findButton" class="btn btn-primary" value=" 查 询 ">' +
+            `&nbsp;&nbsp;
+            <button id="exportButton" class="btn btn-primary">导出PNG</button>
+            `
     );
 
     $('#' + id).prepend(toobarDiv);

@@ -19,17 +19,7 @@ const crawConvery = function(item, i, stage) {
     if (nodes.length > 0) {
         console.log('更新节点111111111', item.ShowStatus);
         const node = nodes[0];
-        if (item.ShowStatus) {
-            node.setImage(0);
-            node.fillColor = item.ShowStatus;
-        } else {
-            if (item.Direction == 'V') {
-                node.setImage(BACEIMGURL + 's-rl.png');
-            } else {
-                node.setImage(BACEIMGURL + 'h-tb.png');
-            }
-        }
-
+        updateConvery(node, item);
         // todo: 新增节点
     } else {
         const node = new JTopo.Node(cc);
@@ -54,6 +44,32 @@ const crawConvery = function(item, i, stage) {
 
         node.setCenterLocation(item.Coordinate_X, item.Coordinate_Y);
         scene.add(node);
+    }
+};
+
+/**
+ *
+ * @param {Node} node  JTopo.Node  节点
+ * @param {Object} item  数据包
+ */
+const updateConvery = function(node, item) {
+    //更新状态颜色
+    if (item.ShowStatus) {
+        node.setImage(0);
+        node.fillColor = item.ShowStatus;
+    } else {
+        if (item.Direction == 'V') {
+            node.setImage(BACEIMGURL + 's-rl.png');
+        } else {
+            node.setImage(BACEIMGURL + 'h-tb.png');
+        }
+    }
+
+    //设备报警
+    if ('') {
+        nodel.alarm = '设备报警';
+    } else {
+        nodel.alarm = null;
     }
 };
 

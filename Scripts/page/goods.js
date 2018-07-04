@@ -12,6 +12,7 @@ const goodsWatch = function(ws) {
     };
     const IMGSRC = {
         '0': cerateImgUrl('0.PNG'),
+        __start: cerateImgUrl('0.PNG'),
         A_0_stop: cerateImgUrl('a0st.PNG'),
         A_0_start: cerateImgUrl('a1sp.PNG'),
         A_1_start: cerateImgUrl('a1st.PNG')
@@ -72,6 +73,7 @@ const goodsWatch = function(ws) {
         ['002', '010', '001', '01'],
         ['002', '020', '015', '01']
     ];
+    let isGet = false; // 是否获取了数据
 
     const canvas = document.getElementById('goodsCanvas');
     setCanvasWH(canvas);
@@ -83,11 +85,26 @@ const goodsWatch = function(ws) {
     scene.backgroundColor = '49,90,119'; //49,90,119
     // stage.wheelZoom = 0.85;
     stage.setCenter(100, -100);
+
+    // 获取详情
     scene.dbclick(function(event) {
         if (event.target == null) return;
         const e = event.target;
-        goodsVue.showModal = true;
-        goodsVue.modalXY = [event.pageX + 20, event.pageY + 20];
+        console.log(e);
+
+        wsRequest(
+            {
+                messagetype: 'getLocationDetail',
+                data: {
+                    locationnumber: e.locationnumber
+                }
+            },
+            function(res) {
+                goodsVue.showModal = true;
+                goodsVue.modalXY = [event.pageX + 20, event.pageY + 20];
+                goodsVue.infoData = res.Data[0];
+            }
+        );
     });
 
     stage.click(function(e) {
@@ -103,7 +120,7 @@ const goodsWatch = function(ws) {
         LOCATIONLINE: '2' // 深
     };
 
-    const createGoods = function(abs, col, row, box, flag) {
+    const createGoods = function(abs, col, row, box, flag, id) {
         // 没】每列 每行 起始坐标
         const x = (parseInt(col, 10) - 1) * (PX.col + PX.width * 2 + PX.box);
         const y = (parseInt(row, 10) - 1) * (-PX.row - PX.width);
@@ -112,11 +129,14 @@ const goodsWatch = function(ws) {
         const boxY = y + PX.row - (PX.row + PX.width) / 2;
 
         const node = new JTopo.Node();
-        node.goodsId = `${abs}-${col}-${row}-${box}`;
+        node.locationnumber = id;
         node.fillColor = '0,0,0,0';
         node.font = '12px';
         node.textPosition = 'Middle_Center';
-        node.setImage(IMGSRC[flag]);
+        if (IMGSRC[flag]) {
+            node.setImage(IMGSRC[flag]);
+        }
+
         node.setSize(PX.width, PX.width);
         node.dragable = false;
 
@@ -131,27 +151,40 @@ const goodsWatch = function(ws) {
 
     const createAll = function(data) {
         data.Data.forEach(aa => {
-            createGoods(aa.LOCATIONDEPTH, aa.LOCATIONCOLUMN, aa.LOCATIONLAYER, aa.LOCATIONLINE, aa.LOCATIONFLAG);
+            createGoods(
+                aa.locationdepth,
+                aa.locationcolumn,
+                aa.locationlayer,
+                aa.locationline,
+                aa.locationflag,
+                aa.locationnumber
+            );
         });
     };
 
+    /**
+     * 生成坐标轴
+     */
     new Array(30).fill(1).forEach((item, i) => {
         const node = new JTopo.Node(`${i}`);
         const node2 = new JTopo.Node(`${i}`);
         const node3 = new JTopo.Node(`${i}`);
 
+        // x
         node.font = '12px';
         node.textPosition = 'Middle_Center';
         //node.setImage(IMGSRC[type]);
         node.setSize(PX.col + PX.width * 2 + PX.box, 1);
         node.selected = false;
 
+        // -x
         node2.font = '12px';
         node2.textPosition = 'Middle_Center';
         //node.setImage(IMGSRC[type]);
         node2.setSize(PX.col + PX.width * 2 + PX.box, 1);
         node2.selected = false;
 
+        // y
         node3.font = '12px';
         node3.textPosition = 'Bottom_Center';
         //node.setImage(IMGSRC[type]);
@@ -209,15 +242,15 @@ const goodsWatch = function(ws) {
                 stage.zoomIn();
             },
             find() {
-                var text = this.keyword.trim();
+                const text = this.keyword.trim();
                 //var nodes = stage.find('node[text="'+text+'"]');
-                var scene = stage.childs[0];
-                var nodes = scene.childs.filter(function(e) {
+                const scene = stage.childs[0];
+                let nodes = scene.childs.filter(function(e) {
                     return e instanceof JTopo.Node;
                 });
                 nodes = nodes.filter(function(e) {
-                    if (e.text == null) return false;
-                    return e.text.indexOf(text) != -1;
+                    if (e.locationnumber == null) return false;
+                    return e.locationnumber.indexOf(text) != -1;
                 });
 
                 if (nodes.length > 0) {
@@ -250,8 +283,18 @@ const goodsWatch = function(ws) {
         }
     });
 
+    // 获取区域等信息
+    wsRequest({ messagetype: 'getLocationCond' }, function(data) {
+        console.log('获取站台区域信息', data);
+        //createAll(data);
+    });
+
     $('#goodsMenu').on('click', function() {
+        if (isGet) {
+            return;
+        }
         wsRequest({ messagetype: 'getLocation' }, function(data) {
+            isGet = true;
             createAll(data);
         });
     });

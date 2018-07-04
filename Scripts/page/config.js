@@ -6,7 +6,8 @@ const scadaUntil = {
      */
     createTimeStamp() {
         const date = new Date();
-        return date.getTime() + Math.random() * 1000;
+        return date.getTime() + '' + Math.ceil(Math.random() * 1000);
+        // return date.getTime();
     }
 };
 
