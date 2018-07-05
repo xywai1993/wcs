@@ -6,6 +6,8 @@
 
 const scadaConfig = function(ws) {
     const BACEIMGURL = '../../Content/img/';
+    const BACEIMGURL2 = '../../Content/locationImg/';
+    const goodsPX = 40; // 货架尺寸
     const IMGSRC = {
         'convery-t': BACEIMGURL + 'top-bottom.png',
         'convery-v': BACEIMGURL + 'left-right.png',
@@ -19,6 +21,7 @@ const scadaConfig = function(ws) {
         bottom: BACEIMGURL + 'bottom.png',
         srm: BACEIMGURL + 'sc.png',
         robot: BACEIMGURL + 'robot.png',
+        goods: BACEIMGURL2 + '_0.png',
         bg: BACEIMGURL + 'bg.jpg'
     };
     const DEVICETYPE = {
@@ -53,8 +56,6 @@ const scadaConfig = function(ws) {
     scene.dbclick(function(event) {
         if (event.target == null) return;
         const e = event.target;
-        console.log(event);
-
         configVue.contextmenu = true;
         configVue.contextmenuXY = [event.pageX + 30, event.pageY + 30];
     });
@@ -66,6 +67,12 @@ const scadaConfig = function(ws) {
      */
     const createNode = function(type, x, y, dir) {
         const node = new JTopo.Node(createNodeIndex);
+
+        node.devType = type;
+        node.font = '16px Consolas';
+        node.fontColor = '255,255,35';
+        node.textPosition = 'Middle_Center';
+        node.setSize(BACEWHPX, BACEWHPX);
         switch (type) {
             //V 水平，T 垂直
             case 'convery-t':
@@ -80,13 +87,12 @@ const scadaConfig = function(ws) {
                 break;
             case 'robot':
                 break;
+            case 'goods':
+                node.setSize(goodsPX, goodsPX);
+                break;
             default:
                 break;
         }
-        node.devType = type;
-        node.font = '16px Consolas';
-        node.fontColor = '255,255,35';
-        node.textPosition = 'Middle_Center';
 
         if (dir) {
             node.setImage(IMGSRC[dir]);
@@ -94,23 +100,31 @@ const scadaConfig = function(ws) {
             node.setImage(IMGSRC[type]);
         }
 
-        node.setSize(BACEWHPX, BACEWHPX);
         createNodeIndex++;
         //node.setLocation(-11, -6);
         //node.selected = true;
         scene.add(node);
 
         //修复位置
-        node.setCenterLocation(fixXY(x), fixXY(y));
 
+        fix(x, y);
         node.mouseup(function(e) {
-            node.setCenterLocation(fixXY(e.x), fixXY(e.y));
+            fix(e.x, e.y);
+            //node.setCenterLocation(fixXY(e.x), fixXY(e.y));
             currentNode = this;
             // if (e.button == 2) {
             //     configVue.contextmenu = true;
             //     configVue.contextmenuXY = [e.pageX, e.pageY];
             // }
         });
+
+        function fix(x, y) {
+            if (type == 'goods') {
+                node.setCenterLocation(fixXY(x, goodsPX), fixXY(y, goodsPX));
+            } else {
+                node.setCenterLocation(fixXY(x), fixXY(y));
+            }
+        }
     };
 
     /**
@@ -176,13 +190,16 @@ const scadaConfig = function(ws) {
         }
         const x = currentNode.x;
         const y = currentNode.y;
+        const type = currentNode.devType;
+        const bacePX = type == 'goods' ? goodsPX : BACEWHPX;
 
         new Array(Number(num)).fill(1).forEach((item, i) => {
             console.log(i);
+
             if (currentNode.direction == 'T') {
-                createNode('convery-t', x + BACEWHPX, y + (i + 2) * BACEWHPX, currentNode.dir);
+                createNode('convery-t', x + bacePX, y + (i + 2) * bacePX, currentNode.dir);
             } else {
-                createNode('convery-v', x + (i + 2) * BACEWHPX, y + BACEWHPX, currentNode.dir);
+                createNode(type, x + (i + 2) * bacePX, y + bacePX, currentNode.dir);
             }
         });
         console.log(currentNode);

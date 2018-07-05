@@ -1,8 +1,14 @@
-const SERVERURL = 'ws://192.16.9.3:9201';
+const SERVERURL = 'ws://192.16.9.2:9202';
 const ws = new WebSocket(SERVERURL); //实例化WebSocket对象
 const wsMessageCallback = {};
 
 let createDeviceFn = null;
+
+/**
+ * websocket 请求函数
+ * @param {Object} obj  {messagetype:'',data:{}}
+ * @param {function} fn 回调函数
+ */
 const wsRequest = function(obj, fn = null) {
     const MessageID = scadaUntil.createTimeStamp();
     if (fn) {
@@ -56,7 +62,6 @@ ws.onmessage = function(e) {
     const json = JSON.parse(e.data); //连接正式服务端时启用
     //var json = e.data;               //连接模拟服务端时启用
     const dataArr = json.Data;
-    wsDataArr = dataArr;
     //console.log(dataArr);
     console.log('数据来了:', json);
     if (wsMessageCallback[json.MessageID]) {
@@ -70,6 +75,7 @@ ws.onmessage = function(e) {
     if (json.Sender == 'WCS') {
         switch (json.MessageType) {
             case 'Init':
+                //为了兼容之前，把 Init 回调写在这了
                 createDeviceFn(json.Data);
                 break;
             case 'checkMesg':
@@ -86,12 +92,8 @@ ws.onmessage = function(e) {
                 break;
             case 'Response':
                 //服务端信息反馈
-
                 break;
             case 'serverMonitor':
-                //服务端数据监控
-                break;
-            case 'sc':
                 //服务端数据监控
                 break;
             default:

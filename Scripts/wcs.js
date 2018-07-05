@@ -1,161 +1,9 @@
 ﻿/**
- * 绘制输送机
- * @param {Object} item 绘制数据包
- * @param {Number} i   当前数量
- * @param {Object} stage 绘制舞台
- */
-const crawConvery = function(item, i, stage) {
-    var cc = item.DeviceID;
-    var scene = stage.childs[0];
-    var nodes = scene.childs.filter(function(e) {
-        return e instanceof JTopo.Node;
-    });
-    nodes = nodes.filter(function(e) {
-        if (e.text == null) return false;
-        return e.text.indexOf(cc) != -1;
-    });
-
-    // todo : 更新节点
-    if (nodes.length > 0) {
-        console.log('更新节点111111111', item.ShowStatus);
-        const node = nodes[0];
-        updateConvery(node, item);
-        // todo: 新增节点
-    } else {
-        const node = new JTopo.Node(cc);
-        //node.setSize(BACEWHPX, BACEWHPX);
-        node.selected = false;
-        node.dragable = false;
-        node.textPosition = 'Middle_Center';
-        node.setSize(50, 50);
-
-        if (item.ShowStatus) {
-            node.fillColor = item.ShowStatus;
-        } else {
-            if (item.Direction == 'V') {
-                node.setImage(BACEIMGURL + 's-rl.png');
-            } else {
-                node.setImage(BACEIMGURL + 'h-tb.png');
-            }
-        }
-        node.DeviceType = item.DeviceType;
-        // node.setImage(0);
-        console.log(item.ShowStatus, node);
-
-        node.setCenterLocation(item.Coordinate_X, item.Coordinate_Y);
-        scene.add(node);
-    }
-};
-
-/**
- *
- * @param {Node} node  JTopo.Node  节点
- * @param {Object} item  数据包
- */
-const updateConvery = function(node, item) {
-    //更新状态颜色
-    if (item.ShowStatus) {
-        node.setImage(0);
-        node.fillColor = item.ShowStatus;
-    } else {
-        if (item.Direction == 'V') {
-            node.setImage(BACEIMGURL + 's-rl.png');
-        } else {
-            node.setImage(BACEIMGURL + 'h-tb.png');
-        }
-    }
-
-    //设备报警
-    if ('') {
-        nodel.alarm = '设备报警';
-    } else {
-        nodel.alarm = null;
-    }
-};
-
-/**
- * 绘制堆剁机
- * @param {Object} item 绘制数据包
- * @param {Number} i   当前数量
- * @param {Object} stage 绘制舞台
- */
-const crawSRM = function(item, i, stage) {
-    var cc = item.DeviceID;
-
-    var scene = stage.childs[0];
-    var nodes = scene.childs.filter(function(e) {
-        return e instanceof JTopo.Node;
-    });
-    nodes = nodes.filter(function(e) {
-        if (e.text == null) return false;
-        return e.text.indexOf(cc) != -1;
-    });
-
-    if (nodes.length > 0) {
-        const node = nodes[0];
-        console.log('堆剁机', item.Coordinate_X, item.Coordinate_Y);
-
-        node.setLocation(item.Coordinate_X, item.Coordinate_Y);
-    } else {
-        const scene = stage.childs[0];
-        var nodeRobot = new JTopo.Node(item.DeviceID);
-        nodeRobot.setSize(100, 100);
-
-        nodeRobot.setImage(BACEIMGURL + 'sc.png');
-        nodeRobot.dragable = false;
-        scene.add(nodeRobot);
-    }
-};
-
-/**
- * 绘制机械手
- * @param {Object} item 绘制数据包
- * @param {Number} i   当前数量
- * @param {Object} stage 绘制舞台
- */
-const crawPutRobot = function(item, i, stage) {
-    console.log('我是机械手');
-    var scene = stage.childs[0];
-    var nodeRobot = new JTopo.Node(item.DeviceID);
-    nodeRobot.setSize(50, 50);
-    nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
-    nodeRobot.setImage(BACEIMGURL + 'robot.png');
-    scene.add(nodeRobot);
-};
-
-/**
- *
- * @param {String} type  站台类型  STA/SRM
- */
-const createPublicButton = function(stationData, config = STATIONBASEDATA) {
-    const data = config[stationData.DeviceType].actionButton;
-
-    //Object.keys().filter(item)
-    const list = [];
-
-    //查找公共按钮
-    Object.keys(data).forEach(item => {
-        if (data[item].isPublic == 1) {
-            list.push(item);
-        }
-    });
-    return list;
-};
-
-/**
- *
- * @param {Object} stationData 站台信息
- * @param {Object} config 配置项
- */
-const createStationButton = function(stationData) {
-    return Object.keys(stationData.ButtonData);
-};
-
-/**
  * 入口函数
  */
 const deviceWatch = function(ws) {
     const BACEIMGURL = '../../Content/img/';
+    const GOODWIDTH = 20;
     const IMGURL = {
         left: BACEIMGURL + 'left.png',
         right: BACEIMGURL + 'right.png',
@@ -163,6 +11,211 @@ const deviceWatch = function(ws) {
         top: BACEIMGURL + 'top.png',
         bottom: BACEIMGURL + 'bottom.png',
         'top-bottom': BACEIMGURL + 'top-bottom.png'
+    };
+    /**
+     * 绘制输送机
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawConvery = function(item, i, stage) {
+        var cc = item.DeviceID;
+        var scene = stage.childs[0];
+        var nodes = scene.childs.filter(function(e) {
+            return e instanceof JTopo.Node;
+        });
+        nodes = nodes.filter(function(e) {
+            if (e.text == null) return false;
+            return e.text.indexOf(cc) != -1;
+        });
+
+        // todo : 更新节点
+        if (nodes.length > 0) {
+            console.log('更新节点111111111', item.ShowStatus);
+            const node = nodes[0];
+            updateConvery(node, item);
+            // todo: 新增节点
+        } else {
+            const node = new JTopo.Node(cc);
+            //node.setSize(BACEWHPX, BACEWHPX);
+            node.selected = false;
+            node.dragable = false;
+            node.textPosition = 'Middle_Center';
+            node.DeviceType = item.DeviceType;
+            node.setSize(50, 50);
+
+            if (item.ShowStatus) {
+                node.fillColor = item.ShowStatus;
+            } else {
+                let url = '';
+                if (item.Direction == 'V') {
+                    url = IMGURL['left-right'];
+                    if (item.Flow == 'L') {
+                        url = IMGURL.left;
+                    } else if (item.Flow == 'R') {
+                        url = IMGURL.right;
+                    }
+                } else {
+                    url = IMGURL['top-bottom'];
+                    if (item.Flow == 'T') {
+                        url = IMGURL.top;
+                    } else if (item.Flow == 'B') {
+                        url = IMGURL.bottom;
+                    }
+                }
+                node.setImage(url);
+            }
+            node.DeviceType = item.DeviceType;
+            // node.setImage(0);
+
+            node.setCenterLocation(item.Coordinate_X, item.Coordinate_Y);
+            scene.add(node);
+        }
+    };
+
+    /**
+     *
+     * @param {Node} node  JTopo.Node  节点
+     * @param {Object} item  数据包
+     */
+    const updateConvery = function(node, item) {
+        //更新状态颜色
+        if (item.ShowStatus) {
+            node.fillColor = item.ShowStatus;
+        } else {
+            let url = '';
+            if (item.Direction == 'V') {
+                url = IMGURL['left-right'];
+                if (item.Flow == 'L') {
+                    url = IMGURL.left;
+                } else if (item.Flow == 'R') {
+                    url = IMGURL.right;
+                }
+            } else {
+                url = IMGURL['top-bottom'];
+                if (item.Flow == 'U') {
+                    url = IMGURL.top;
+                } else if (item.Flow == 'D') {
+                    url = IMGURL.bottom;
+                }
+            }
+            console.log(url);
+
+            node.setImage(url);
+        }
+
+        // todo  设备报警
+        if ('') {
+            node.alarm = '设备报警';
+        } else {
+            node.alarm = null;
+        }
+    };
+
+    /**
+     * 绘制堆剁机
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawSRM = function(item, i, stage) {
+        const SRMWidth = 100;
+        var cc = item.DeviceID;
+
+        var scene = stage.childs[0];
+        var nodes = scene.childs.filter(function(e) {
+            return e instanceof JTopo.Node;
+        });
+        nodes = nodes.filter(function(e) {
+            if (e.text == null) return false;
+
+            return e.text.indexOf(cc) != -1;
+        });
+
+        if (nodes.length > 0) {
+            const node = nodes[0];
+            console.log('堆剁机位置', item.Coordinate_X, item.Coordinate_Y);
+            node.setLocation(item.Coordinate_X + item.Row * GOODWIDTH + SRMWidth, item.Coordinate_Y);
+        } else {
+            const scene = stage.childs[0];
+            var nodeRobot = new JTopo.Node(item.DeviceID);
+            nodeRobot.DeviceType = item.DeviceType;
+            nodeRobot.setSize(SRMWidth, SRMWidth);
+            nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
+            nodeRobot.setImage(BACEIMGURL + 'sc.png');
+            nodeRobot.dragable = false;
+            createGoods(20, item.Coordinate_X, item.Coordinate_Y, SRMWidth, SRMWidth);
+            scene.add(nodeRobot);
+        }
+
+        function createGoods(num, x, y, width, height) {
+            new Array(num).fill(1).forEach((item, i) => {
+                const node = new JTopo.Node(i + 1 + '');
+                const node2 = new JTopo.Node(i + 1 + '');
+                const [w, h] = [GOODWIDTH, GOODWIDTH];
+
+                node.setSize(w, h);
+                node2.setSize(w, h);
+                node.setLocation(x + width + w * i, y - h);
+                node.textPosition = 'Middle_Center';
+                node2.textPosition = 'Middle_Center';
+                node2.setLocation(x + width + w * i, y + height);
+                node.dragable = false;
+                node2.dragable = false;
+                node.selected = false;
+                node2.selected = false;
+                node.DeviceType = 'goods';
+                node2.DeviceType = 'goods';
+
+                scene.add(node2);
+                scene.add(node);
+            });
+        }
+    };
+
+    /**
+     * 绘制机械手
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawPutRobot = function(item, i, stage) {
+        console.log('我是机械手');
+        var scene = stage.childs[0];
+        var nodeRobot = new JTopo.Node(item.DeviceID);
+        nodeRobot.setSize(50, 50);
+        nodeRobot.DeviceType = item.DeviceType;
+        nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
+        nodeRobot.setImage(BACEIMGURL + 'robot.png');
+        scene.add(nodeRobot);
+    };
+
+    /**
+     *
+     * @param {String} type  站台类型  STA/SRM
+     */
+    const createPublicButton = function(stationData, config = STATIONBASEDATA) {
+        const data = config[stationData.DeviceType].actionButton;
+
+        //Object.keys().filter(item)
+        const list = [];
+
+        //查找公共按钮
+        Object.keys(data).forEach(item => {
+            if (data[item].isPublic == 1) {
+                list.push(item);
+            }
+        });
+        return list;
+    };
+
+    /**
+     *
+     * @param {Object} stationData 站台信息
+     * @param {Object} config 配置项
+     */
+    const createStationButton = function(stationData) {
+        return Object.keys(stationData.ButtonData);
     };
 
     //创建舞台
@@ -178,7 +231,6 @@ const deviceWatch = function(ws) {
     setCanvasWH(canvas);
     //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
 
-    let wsDataArr = [];
     let stationData = {}; // 单个站台信息
     // 舞台单击事件
     stage.click(function(event) {
@@ -195,7 +247,13 @@ const deviceWatch = function(ws) {
         var e = event.target;
         console.log(e);
 
-        wsRequest({ messagetype: 'getStationInfo', data: { DeviceID: e.text, DeviceType: 'STA' } }, function(data) {
+        //点击了货架，不需要处理
+        if (e.DeviceType == 'goods') {
+            return;
+        }
+        wsRequest({ messagetype: 'getStationInfo', data: { DeviceID: e.text, DeviceType: e.DeviceType } }, function(
+            data
+        ) {
             console.log('收到站台信息：', data);
             stationData = data.Data;
             homeVue.stationData = stationData;
@@ -283,7 +341,7 @@ const deviceWatch = function(ws) {
                         };
                         break;
                 }
-                confirm('确定修改') &&
+                confirm('确定修改？') &&
                     wsRequest(
                         {
                             messagetype: 'WriteDevice',
@@ -323,7 +381,7 @@ const deviceWatch = function(ws) {
     wsRequest({ messagetype: 'Init' }, function(data) {
         console.log('收到type为Init的数据', data);
         const dataArr = data.Data;
-        createFn(dataArr);
+        // createFn(dataArr);
     });
     const createFn = dataArr => {
         dataArr.forEach((item, i) => {
@@ -340,6 +398,7 @@ const deviceWatch = function(ws) {
                     crawSRM(item, i, stage);
                     break;
                 case 'PutRobot':
+                case 'PickRobot':
                     //绘制机械手
                     crawPutRobot(item, i, stage);
                     break;

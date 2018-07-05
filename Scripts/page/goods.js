@@ -119,9 +119,17 @@ const goodsWatch = function(ws) {
         LOCATIONLAYER: '7', //  层
         LOCATIONLINE: '2' // 深
     };
-
+    /**
+     * 创建货架
+     * @param {Number} abs 排
+     * @param {Number} col 列
+     * @param {Number} row 行
+     * @param {Number} box 深
+     * @param {String} flag 状态
+     * @param {String} id 货架ID
+     */
     const createGoods = function(abs, col, row, box, flag, id) {
-        // 没】每列 每行 起始坐标
+        // 每列 每行 起始坐标
         const x = (parseInt(col, 10) - 1) * (PX.col + PX.width * 2 + PX.box);
         const y = (parseInt(row, 10) - 1) * (-PX.row - PX.width);
 

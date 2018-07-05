@@ -1,5 +1,5 @@
 const BACEWHPX = 80;
-const SHOWMENU = false;
+const SHOWMENU = false; // 是否显示菜单栏
 const scadaUntil = {
     /**
      * 创建时间戳
