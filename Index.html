@@ -90,32 +90,46 @@
                             </div>
                             <div style="width: 300px;">
                                 <h3>修改信息</h3>
+
                                 <ul class="modify-info">
-                                    <li v-for="(val,key) in equipmentinfo">
-                                        <span> {{key | en2zh}}:</span>
-                                        <input type="text" class="form-control" v-model="equipmentinfo[key]" v-if="key !=='GoodsType' ">
-                                        <select class="form-control" v-else v-model="equipmentinfo[key]" style="width:160px">
-                                            <option :value="key" v-for="(val,key) in GOODSTYPE">{{val.name}}</option>
-                                        </select>
-                                    </li>
-                                    <li v-show="stationData.DeviceType=='SRM'">
-                                        <span> 指令:</span>
-                                        <select class="form-control" style="width:160px">
-                                            <option>指令1</option>
-                                            <option>指令1</option>
-                                            <option>指令1</option>
-                                        </select>
-                                    </li>
-                                    <li v-show="stationData.DeviceType=='SRM'">
-                                        <span> 命令:</span>
-                                        <select class="form-control" style="width:160px">
-                                            <option>移动</option>
-                                            <option>取放货</option>
-                                            <option>召回</option>
-                                            <option>取消任务</option>
-                                            <option>消防任务</option>
-                                        </select>
-                                    </li>
+                                    <template v-if="stationData.DeviceType=='Convery'">
+                                        <li v-for="(val,key) in equipmentinfo">
+                                            <span> {{key | en2zh}}:</span>
+                                            <input type="text" class="form-control" v-model="equipmentinfo[key]" v-if="key !=='GoodsType' ">
+                                            <select class="form-control" v-else v-model="equipmentinfo[key]" style="width:160px">
+                                                <option :value="key" v-for="(val,key) in GOODSTYPE">{{val.name}}</option>
+                                            </select>
+                                        </li>
+                                    </template>
+
+                                    <template v-if="stationData.DeviceType=='SRM'">
+                                        <li>
+                                            <span> 工位:</span>
+                                            <select class="form-control" style="width:160px">
+                                                <option>工位1</option>
+                                                <option>工位2</option>
+                                            </select>
+                                        </li>
+                                        <li>
+                                            <span> 指令:</span>
+                                            <select class="form-control" style="width:160px">
+                                                <option>指令1</option>
+                                                <option>指令1</option>
+                                                <option>指令1</option>
+                                            </select>
+                                        </li>
+                                        <li>
+                                            <span> 命令:</span>
+                                            <select class="form-control" style="width:160px">
+                                                <option>移动</option>
+                                                <option>取放货</option>
+                                                <option>召回</option>
+                                                <option>取消任务</option>
+                                                <option>消防任务</option>
+                                            </select>
+                                        </li>
+                                    </template>
+
                                 </ul>
 
                             </div>
@@ -123,8 +137,9 @@
                                 <h3>功能按钮</h3>
                                 <div>
                                     <button class="btn btn-primary until-btn " v-for="item in stationButton" @click="actionButton(item)">{{item | button2zh}}</button>
-
-                                    <button class="btn btn-primary until-btn" v-show="stationData.DeviceType=='SRM'">发送</button>
+                                </div>
+                                <div v-show="stationData.DeviceType=='SRM'">
+                                    <button class="btn btn-primary until-btn" @click="sendSRMInfo">发送</button>
                                 </div>
                             </div>
                         </div>
@@ -272,7 +287,7 @@
     <script src="Scripts/page/config.js "></script>
     <script src="Scripts/page/setting.js "></script>
     <script src="Scripts/page/goods.js "></script>
-    <script src="Scripts/wcs.js "></script>
+    <script src="Scripts/page/wcs.js "></script>
     <script src="Scripts/page/main.js"></script>
 </body>
 

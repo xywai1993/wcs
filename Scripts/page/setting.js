@@ -164,20 +164,26 @@ const scadaConfig = function(ws) {
                 Coordinate_X: item.x,
                 Coordinate_Y: item.y,
                 Coordinate_Z: 1,
+                Flow: item.dir,
                 Length: 1,
                 Width: 1,
                 Hight: 1,
+                Size: BACEWHPX,
                 Direction: item.direction || 'T' // V 水平，T 垂直
             };
         });
 
-        wsRequest({
-            messagetype: 'SystemConfig',
-            data: data,
+        wsRequest(
+            {
+                messagetype: 'SystemConfig',
+                data: data
+            },
             function(data) {
+                console.log(data);
+                // dosomething
                 console.log('提交配置后的回调');
             }
-        });
+        );
     };
 
     /**
