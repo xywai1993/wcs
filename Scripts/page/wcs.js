@@ -3,15 +3,20 @@
  */
 const deviceWatch = function(ws) {
     const BACEIMGURL = '../../Content/img/';
-    const GOODWIDTH = 20;
+    const GOODWIDTH = 14;
     const IMGURL = {
         left: BACEIMGURL + 'left.png',
         right: BACEIMGURL + 'right.png',
         'left-right': BACEIMGURL + 'left-right.png',
         top: BACEIMGURL + 'top.png',
         bottom: BACEIMGURL + 'bottom.png',
-        'top-bottom': BACEIMGURL + 'top-bottom.png'
+        'top-bottom': BACEIMGURL + 'top-bottom.png',
+
+        loadSc: BACEIMGURL + 't_hcg.png',
+        sc: BACEIMGURL + 'sc.png',
+        robot: BACEIMGURL + 'robot.png'
     };
+
     /**
      * 绘制输送机
      * @param {Object} item 绘制数据包
@@ -82,6 +87,8 @@ const deviceWatch = function(ws) {
     const updateConvery = function(node, item) {
         //更新状态颜色
         if (item.ShowStatus) {
+            console.log('更新状态颜色', item.ShowStatus, item.DeviceID);
+            node.setImage(0);
             node.fillColor = item.ShowStatus;
         } else {
             let url = '';
@@ -100,16 +107,17 @@ const deviceWatch = function(ws) {
                     url = IMGURL.bottom;
                 }
             }
-            console.log(url);
-
             node.setImage(url);
         }
 
         // todo  设备报警
-        if ('') {
+        if (item.Status != 1) {
+            //alert('有设备报警，请及时处理');
+            openAudio();
             node.alarm = '设备报警';
         } else {
             node.alarm = null;
+            closeAudio();
         }
     };
 
@@ -135,9 +143,32 @@ const deviceWatch = function(ws) {
 
         if (nodes.length > 0) {
             const node = nodes[0];
-            console.log('堆剁机位置', item.Coordinate_X, item.Coordinate_Y);
+
             node.text = `${item.DeviceID}位于${item.Row}列`;
-            node.setLocation(item.Coordinate_X + item.Row * GOODWIDTH + SRMWidth, item.Coordinate_Y);
+            node.setLocation(item.Coordinate_X + item.Row * GOODWIDTH, item.Coordinate_Y);
+
+            if (item.ShowStatus) {
+                node.setImage(0);
+                node.fillColor = item.ShowStatus;
+            } else {
+                node.setImage(BACEIMGURL + 'sc.png');
+            }
+
+            // todo  设备报警
+            if (item.Status != 1) {
+                node.alarm = '设备报警';
+                openAudio();
+            } else {
+                node.alarm = null;
+                closeAudio();
+            }
+
+            if (item.Load == 1) {
+                // node.setImage(0);
+                node.setImage(IMGURL.loadSc);
+            } else {
+                node.setImage(IMGURL.sc);
+            }
         } else {
             const scene = stage.childs[0];
             var nodeRobot = new JTopo.Node(`${item.DeviceID}位于${item.Row}列`);
@@ -145,10 +176,22 @@ const deviceWatch = function(ws) {
             nodeRobot.DeviceType = item.DeviceType;
             nodeRobot.textPosition = 'Middle_Center';
             nodeRobot.setSize(SRMWidth, SRMWidth);
-            nodeRobot.setLocation(item.Coordinate_X + item.Row * GOODWIDTH + SRMWidth, item.Coordinate_Y);
-            nodeRobot.setImage(BACEIMGURL + 'sc.png');
+            nodeRobot.setLocation(item.Coordinate_X + item.Row * GOODWIDTH, item.Coordinate_Y);
+            if (item.ShowStatus) {
+                nodeRobot.fillColor = item.ShowStatus;
+            } else {
+                nodeRobot.setImage(BACEIMGURL + 'sc.png');
+            }
             nodeRobot.dragable = false;
-            createGoods(20, item.Coordinate_X, item.Coordinate_Y, SRMWidth, SRMWidth);
+            // todo  设备报警
+            if (item.Status != 1) {
+                //alert('有设备报警，请及时处理');
+                nodeRobot.alarm = '设备报警';
+                openAudio();
+            } else {
+                nodeRobot.alarm = null;
+            }
+            createGoods(37, item.Coordinate_X, item.Coordinate_Y, SRMWidth, SRMWidth);
             scene.add(nodeRobot);
         }
 
@@ -186,11 +229,20 @@ const deviceWatch = function(ws) {
     const crawPutRobot = function(item, i, stage) {
         console.log('我是机械手');
         var scene = stage.childs[0];
-        var nodeRobot = new JTopo.Node(item.DeviceID);
+        const nodeRobot = new JTopo.Node(item.DeviceID);
+        nodeRobot.DeviceID = item.DeviceID;
         nodeRobot.setSize(50, 50);
         nodeRobot.DeviceType = item.DeviceType;
+
+        //nodeRobot.textPosition = 'Middle_Center';
+        console.log(item.Coordinate_X, item.Coordinate_Y);
+
         nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
-        nodeRobot.setImage(BACEIMGURL + 'robot.png');
+        nodeRobot.shadow = false;
+        console.log(nodeRobot.getBound());
+
+        nodeRobot.setImage(IMGURL.robot);
+        nodeRobot.dragable = false;
         scene.add(nodeRobot);
     };
 
@@ -249,7 +301,6 @@ const deviceWatch = function(ws) {
     scene.dbclick(function(event) {
         if (event.target == null) return;
         var e = event.target;
-        console.log(e);
 
         //点击了货架，不需要处理
         if (e.DeviceType == 'goods') {
@@ -276,6 +327,15 @@ const deviceWatch = function(ws) {
         // homeVue.stationData = stationData;
     });
 
+    const openAudio = function() {
+        const audio = document.querySelector('#audio');
+        audio.play();
+    };
+    //openAudio();
+    const closeAudio = function() {
+        const audio = document.querySelector('#audio');
+        audio.pause();
+    };
     //红色：'237,19,12'
     //绿色：48,187,35   浅绿：45,168,131
     //橘黄色：251,143,27
@@ -291,7 +351,14 @@ const deviceWatch = function(ws) {
             showEquipmentinfo: false,
             equipmentinfoXY: [0, 0],
 
-            SRMInfo: {},
+            SRMInfo: {
+                LoadNum: '',
+                CommandType: '',
+                taskNum: '',
+                BarCode: '',
+                SourceAddress: '',
+                TargetAddress: ''
+            },
 
             publicButton: [],
             stationButton: [],
@@ -308,7 +375,7 @@ const deviceWatch = function(ws) {
                     case 'updateInfo':
                         data = this.equipmentinfo;
                         fn = res => {
-                            alert(res.Data.msg);
+                            alert(res.Data.Msg);
                             if (res.Data.Code == 200) {
                                 this.copyEquipmentinfo = JSON.parse(JSON.stringify(data));
                             }
@@ -318,13 +385,16 @@ const deviceWatch = function(ws) {
                         data = this.equipmentinfo;
                         let delInfo = this.stationData.ButtonData['delInfo'];
                         Object.keys(delInfo).forEach(item => {
-                            data[item] = [delInfoitem];
+                            data[item] = delInfo[item];
                         });
-                        fn = function(res) {
-                            console.log('delInfo更新信息成功');
-                        };
+
                         break;
                     case 'getInfo':
+                        data = this.equipmentinfo;
+                        let getInfo = this.stationData.ButtonData['getInfo'];
+                        Object.keys(getInfo).forEach(item => {
+                            data[item] = getInfo[item];
+                        });
                         break;
                     case 'normalRemove':
                         let normalRemove = this.stationData.ButtonData['normalRemove'];
@@ -332,9 +402,6 @@ const deviceWatch = function(ws) {
                             this.equipmentinfo[item] = normalRemove[item];
                         });
 
-                        fn = function() {
-                            console.log('正常排出成功');
-                        };
                         break;
                     case 'abnormalRemove':
                         let abnormalRemove = this.stationData.ButtonData['abnormalRemove'];
@@ -342,9 +409,6 @@ const deviceWatch = function(ws) {
                             this.equipmentinfo[item] = abnormalRemove[item];
                         });
 
-                        fn = function() {
-                            console.log('异常排出成功');
-                        };
                         break;
                 }
                 confirm('确定修改？') &&
@@ -357,7 +421,12 @@ const deviceWatch = function(ws) {
                                 DeviceInfo: this.equipmentinfo
                             }
                         },
-                        fn
+                        res => {
+                            alert(res.Data.Msg);
+                            if (res.Data.Code == 200) {
+                                this.copyEquipmentinfo = JSON.parse(JSON.stringify(this.equipmentinfo));
+                            }
+                        }
                     );
             },
             sendSRMInfo() {
@@ -372,8 +441,15 @@ const deviceWatch = function(ws) {
                     },
                     function(res) {
                         console.log('执行SRM设备的写入回调函数');
+                        alert(res.Data.Msg);
                     }
                 );
+            },
+            close() {
+                this.showEquipmentinfo = false;
+            },
+            closeAudio() {
+                closeAudio();
             }
         },
         filters: {
@@ -406,9 +482,6 @@ const deviceWatch = function(ws) {
     });
     const createFn = dataArr => {
         dataArr.forEach((item, i) => {
-            if (item.ShowStatus) {
-                console.log(item.ShowStatus);
-            }
             switch (item.DeviceType) {
                 case 'Convery':
                     //绘制输送机

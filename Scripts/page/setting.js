@@ -28,7 +28,8 @@ const scadaConfig = function(ws) {
         'convery-t': 'Convery',
         'convery-v': 'Convery',
         srm: 'SRM',
-        robot: 'PutRobot'
+        robot: 'PutRobot',
+        goods: 'LOC'
     };
 
     const canvas = document.getElementById('configCanvas');
@@ -41,10 +42,7 @@ const scadaConfig = function(ws) {
     stage.wheelZoom = 0.85;
 
     let createNodeIndex = 1;
-    let startCopy = false;
     let currentNode = null;
-    const $copyNode = $('#copyNode');
-    const $contextmenu = $('#configContextmenu');
 
     //
     stage.click(function(e) {
@@ -56,9 +54,95 @@ const scadaConfig = function(ws) {
     scene.dbclick(function(event) {
         if (event.target == null) return;
         const e = event.target;
+        currentNode = e;
         configVue.contextmenu = true;
         configVue.contextmenuXY = [event.pageX + 30, event.pageY + 30];
     });
+
+    /**
+     * 绘制输送机
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawConvery = function(item, i, stage) {
+        const node = new JTopo.Node(item.DeviceID);
+        node.DeviceID = item.DeviceID;
+        node.font = '16px Consolas';
+        node.fontColor = '255,255,35';
+        node.textPosition = 'Middle_Center';
+        node.DeviceType = item.DeviceType;
+        node.setSize(item.Size, item.Size);
+
+        let dir = '';
+        let type = '';
+        if (item.Direction == 'V') {
+            type = 'convery-v';
+            url = IMGSRC['left-right'];
+            node.direction = 'V';
+            node.dir = 'left-right';
+
+            if (item.Flow == 'L') {
+                node.dir = 'left';
+            } else if (item.Flow == 'R') {
+                node.dir = 'right';
+            }
+        } else {
+            node.direction = 'T';
+            type = 'convery-t';
+            if (item.Flow == 'T') {
+                node.dir = 'top';
+            } else if (item.Flow == 'B') {
+                node.dir = 'bottom';
+            }
+        }
+
+        //createNode();
+        node.setImage(IMGSRC[node.dir]);
+        node.devType = type;
+        node.DeviceType = item.DeviceType;
+        // node.setImage(0);
+        node.setCenterLocation(fixXY(item.Coordinate_X), fixXY(item.Coordinate_Y));
+        node.mouseup(function(e) {
+            node.setCenterLocation(fixXY(e.x), fixXY(e.y));
+            currentNode = this;
+        });
+        scene.add(node);
+    };
+
+    /**
+     * 绘制堆剁机
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawSRM = function(item, i, stage) {
+        var nodeRobot = new JTopo.Node(item.DeviceID);
+        nodeRobot.DeviceID = item.DeviceID;
+        nodeRobot.DeviceType = item.DeviceType;
+        nodeRobot.textPosition = 'Middle_Center';
+        nodeRobot.setSize(item.Size, item.Size);
+        nodeRobot.setLocation(fixXY(item.Coordinate_X), fixXY(item.Coordinate_Y));
+        nodeRobot.setImage(BACEIMGURL + 'sc.png');
+        scene.add(nodeRobot);
+    };
+
+    /**
+     * 绘制机械手
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawPutRobot = function(item, i, stage) {
+        var scene = stage.childs[0];
+        var nodeRobot = new JTopo.Node(item.DeviceID);
+        nodeRobot.setSize(item.Size, item.Size);
+        nodeRobot.DeviceType = item.DeviceType;
+        nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
+        nodeRobot.setLocation(fixXY(item.Coordinate_X), fixXY(item.Coordinate_Y));
+        scene.add(nodeRobot);
+    };
+
     /**
      * 创建新节点
      * @param {String} type 设备类型 见常量DEVICETYPE
@@ -155,6 +239,33 @@ const scadaConfig = function(ws) {
      */
     const commit = function() {
         console.log(scene.childs);
+
+        const dir2flow = function(type) {
+            switch (type) {
+                case 'top-bottom':
+                    return 'UD';
+                    break;
+                case 'top':
+                    return 'U';
+                    break;
+                case 'bottom':
+                    return 'D';
+                    break;
+                case 'left-right':
+                    return 'LR';
+                    break;
+                case 'left':
+                    return 'L';
+                    break;
+                case 'right':
+                    return 'R';
+                    break;
+                default:
+                    return '';
+                    break;
+            }
+        };
+
         const data = scene.childs.map(item => {
             return {
                 DeviceID: item.text,
@@ -164,11 +275,11 @@ const scadaConfig = function(ws) {
                 Coordinate_X: item.x,
                 Coordinate_Y: item.y,
                 Coordinate_Z: 1,
-                Flow: item.dir,
+                Flow: dir2flow(item.dir),
                 Length: 1,
                 Width: 1,
                 Hight: 1,
-                Size: BACEWHPX,
+                Size: item.devType == 'goods' ? goodsPX : BACEWHPX,
                 Direction: item.direction || 'T' // V 水平，T 垂直
             };
         });
@@ -182,6 +293,7 @@ const scadaConfig = function(ws) {
                 console.log(data);
                 // dosomething
                 console.log('提交配置后的回调');
+                alert(data.Data.Msg);
             }
         );
     };
@@ -244,6 +356,8 @@ const scadaConfig = function(ws) {
         if (!name) {
             return;
         }
+        console.log(currentNode);
+
         currentNode.text = name;
     };
 
@@ -280,6 +394,33 @@ const scadaConfig = function(ws) {
             }
         }
     });
+
+    wsRequest({ messagetype: 'getSystemConfig' }, function(data) {
+        const dataArr = data.Data;
+        createFn(dataArr);
+    });
+    const createFn = dataArr => {
+        dataArr.forEach((item, i) => {
+            switch (item.DeviceType) {
+                case 'Convery':
+                    //绘制输送机
+                    crawConvery(item, i, stage);
+                    break;
+                case 'SRM':
+                    //收到堆垛机数据
+                    crawSRM(item, i, stage);
+                    break;
+                case 'PutRobot':
+                case 'PickRobot':
+                    //绘制机械手
+                    crawPutRobot(item, i, stage);
+                    break;
+                default:
+                    console.log('未知的DeviceType');
+                    break;
+            }
+        });
+    };
 
     return {};
 };

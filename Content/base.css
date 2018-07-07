@@ -481,12 +481,14 @@ h2 {
     height: 36px;
 }
 .modify-info li span {
-    width: 80px;
-    margin-right: 10px;
+    width: 120px;
+    padding-right: 10px;
     display: block;
     color: #999999;
+    text-align: right;
 }
-.modify-info input {
+.modify-info input,
+.modify-info select {
     width: 160px;
 }
 .until-btn {
@@ -496,8 +498,20 @@ h2 {
     border-top: 1px solid #eeeeee;
 }
 .info-modal-title {
+    position: relative;
     font-size: 20px;
     text-align: center;
+}
+.info-modal-title span {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    background: #eb7b55;
+    color: #fff;
+    border-radius: 100%;
 }
 
 /* 货位监控 */

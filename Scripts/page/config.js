@@ -1,4 +1,4 @@
-const BACEWHPX = 80;
+const BACEWHPX = 50;
 const SHOWMENU = false; // 是否显示菜单栏
 const scadaUntil = {
     /**

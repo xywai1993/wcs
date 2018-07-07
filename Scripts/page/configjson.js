@@ -207,7 +207,17 @@ const EN2EH = {
     FromStation: '起始地址',
     ToStation: '目标地址',
     TrayCode: '托盘条码',
-    GoodsType: '货物类型'
+    GoodsType: '货物类型',
+    Load1Status: '工位1载货状态',
+    Load2Status: '工位2载货状态',
+    b_I_Row: '当前位置',
+    b_I_State: '执行状态',
+    b_I_TaskId1: '工位1任务号',
+    b_I_TaskId2: '工位2任务号',
+    b_I_TaskStatus1: '任务1状态',
+    b_I_TaskStatus2: '任务2状态',
+    IsInit: '是否初始化完成',
+    SendFlag: '是否允许下发'
 };
 
 const STATIONS = {

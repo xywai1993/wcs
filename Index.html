@@ -75,10 +75,12 @@
             </div>
             <section id="homeVue">
                 <section class=" panel panel-default info-modal " v-show="showEquipmentinfo" :style="{left:equipmentinfoXY[0]+'px',top:equipmentinfoXY[1]+'px'}">
-                    <div class="panel-heading info-modal-title">设备号:{{stationData.DeviceID}}</div>
+                    <div class="panel-heading info-modal-title">设备号:{{stationData.DeviceID}}
+                        <span @click="close"> X</span>
+                    </div>
                     <div class="panel-body ">
                         <div class="info-modal-content">
-                            <div>
+                            <div style="width: 300px;">
                                 <h3>当前信息</h3>
                                 <ul class="modify-info">
                                     <li v-for="(val,key) in copyEquipmentinfo">
@@ -88,11 +90,11 @@
                                 </ul>
 
                             </div>
-                            <div style="width: 300px;">
+                            <div style="width: 320px;">
                                 <h3>修改信息</h3>
 
                                 <ul class="modify-info">
-                                    <template v-if="stationData.DeviceType=='Convery'">
+                                    <template v-if="stationData.DeviceType=='STA'">
                                         <li v-for="(val,key) in equipmentinfo">
                                             <span> {{key | en2zh}}:</span>
                                             <input type="text" class="form-control" v-model="equipmentinfo[key]" v-if="key !=='GoodsType' ">
@@ -105,28 +107,42 @@
                                     <template v-if="stationData.DeviceType=='SRM'">
                                         <li>
                                             <span> 工位:</span>
-                                            <select class="form-control" style="width:160px">
-                                                <option>工位1</option>
-                                                <option>工位2</option>
+                                            <select class="form-control" style="width:160px !important" v-model="SRMInfo.LoadNum">
+                                                <option value="">请选择工位</option>
+                                                <option value="1">工位1</option>
+                                                <option value="2">工位2</option>
                                             </select>
-                                        </li>
-                                        <li>
-                                            <span> 指令:</span>
-                                            <select class="form-control" style="width:160px">
-                                                <option>指令1</option>
-                                                <option>指令1</option>
-                                                <option>指令1</option>
-                                            </select>
+
                                         </li>
                                         <li>
                                             <span> 命令:</span>
-                                            <select class="form-control" style="width:160px">
-                                                <option>移动</option>
-                                                <option>取放货</option>
-                                                <option>召回</option>
-                                                <option>取消任务</option>
-                                                <option>消防任务</option>
+                                            <select class="form-control" style="width:160px " v-model="SRMInfo.CommandType">
+                                                <option value="">无</option>
+                                                <option value="1">移动</option>
+                                                <option value="2">取放货</option>
+                                                <option value="3">召回</option>
+                                                <option value="11">仅取货</option>
+                                                <option value="4">取消任务</option>
+                                                <option value="12">消防任务（不启动灭火）</option>
+                                                <option value="13">消防任务（启动灭火）</option>
+                                                <option value="14">消防任务（避让）</option>
                                             </select>
+                                        </li>
+                                        <li>
+                                            <span> 任务号:</span>
+                                            <input type="text" class="form-control" v-model="SRMInfo.taskNum">
+                                        </li>
+                                        <li>
+                                            <span> 托盘条码:</span>
+                                            <input type="text" class="form-control" v-model="SRMInfo.BarCode">
+                                        </li>
+                                        <li>
+                                            <span> 起始地址:</span>
+                                            <input type="text" class="form-control" v-model="SRMInfo.SourceAddress">
+                                        </li>
+                                        <li>
+                                            <span> 目标地址:</span>
+                                            <input type="text" class="form-control" v-model="SRMInfo.TargetAddress">
                                         </li>
                                     </template>
 
@@ -139,13 +155,16 @@
                                     <button class="btn btn-primary until-btn " v-for="item in stationButton" @click="actionButton(item)">{{item | button2zh}}</button>
                                 </div>
                                 <div v-show="stationData.DeviceType=='SRM'">
-                                    <button class="btn btn-primary until-btn" @click="sendSRMInfo">发送</button>
+                                    <button class="btn btn-primary until-btn" @click="sendSRMInfo">确认修改信息</button>
                                 </div>
                             </div>
                         </div>
                         <div class="info-modal-alert">
                             <h5>设备报警</h5>
                             <div>{{stationData.Warm}}</div>
+                            <div>
+                                <button @click="closeAudio" class="btn btn-primary">关闭报警音</button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -278,6 +297,7 @@
         <div class="tab-pane" id="taskManage "></div>
     </div>
     </div>
+    <audio src="Content/audio.mp3" style="opacity: 0;" id="audio"></audio>
     <script type="text/javascript " src="Scripts/jquery-1.10.2.min.js "></script>
     <script src="Scripts/bootstrap.min.js "></script>
     <script src="Scripts/vue.dev2.0.js "></script>
@@ -289,6 +309,7 @@
     <script src="Scripts/page/goods.js "></script>
     <script src="Scripts/page/wcs.js "></script>
     <script src="Scripts/page/main.js"></script>
+
 </body>
 
 </html>

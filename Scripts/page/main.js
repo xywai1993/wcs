@@ -1,4 +1,4 @@
-const SERVERURL = 'ws://192.16.9.2:9202';
+const SERVERURL = 'ws://192.16.9.108:9201';
 const ws = new WebSocket(SERVERURL); //实例化WebSocket对象
 const wsMessageCallback = {};
 
