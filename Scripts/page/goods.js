@@ -42,14 +42,14 @@ const goodsWatch = function(ws) {
     };
 
     const locationInfoData2zh = {
-        Locationnumber:'货位编号',
-        ItemName:'物料名称',
-        TechnologyName:'工艺名称',
-        Sotredtime:'存储时间',
-        FirstInTime:'入库时间',
-        LocationFlag:'货位标记',
-        SelectZone:''    //选择区域
-        
+        Locationnumber: '货位编号',
+        ItemName: '物料名称',
+        TechnologyName: '工艺名称',
+        Sotredtime: '存储时间',
+        FirstInTime: '入库时间',
+        LocationFlag: '货位标记',
+        SelectZone: '' //选择区域
+
         //zonename: '区域名称', //区域名称
         //locationnumber: '货位编号', //货位编号
         //itemname: '物料名称', //物料名称
@@ -59,8 +59,8 @@ const goodsWatch = function(ws) {
         //technology: '工艺名称' //工艺名称
     };
 
-    const locationOther={
-        SelectZone:'',  //界面选择的区域名称
+    const locationOther = {
+        SelectZone: '' //界面选择的区域名称
     };
 
     const goodsData = [
@@ -179,7 +179,7 @@ const goodsWatch = function(ws) {
                 aa.LocationLayer,
                 aa.LocationLine,
                 aa.LocationFlag,
-                aa.LocationNumber                                                          
+                aa.LocationNumber
             );
         });
         //console.log('我是货位监控，啦啦啦啦啦啦啦啦啦啦啦：', data);
@@ -246,7 +246,7 @@ const goodsWatch = function(ws) {
             showModal: false,
             modalXY: [0, 0],
             infoData: locationInfoData,
-            region:''
+            region: '' // 绑定的区域 数据 。界面上选择的哪个区域 就可以用这个取值
         },
         watch: {
             zoom(val) {
@@ -304,6 +304,11 @@ const goodsWatch = function(ws) {
             en2zh(name) {
                 return locationInfoData2zh[name] ? locationInfoData2zh[name] : name;
             }
+        },
+        mounted() {
+            //这里是页面初始化的回调 ，可以在这样进行第一次 服务器拉取操作
+            // this.region  这个就是区域的值
+            // todo
         }
     });
 
