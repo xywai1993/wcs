@@ -200,29 +200,29 @@
                 <input type="text" v-model="keyword" class="form-control" style="width: 100px" placeholder="货架编号" />
                 <button @click="find" class="btn btn-primary">查询</button>
                 <div style="height: 40px;border-right: 1px solid #eeeeee"></div>
-                <select name="" id="" class="form-control" style="width: 100px">
+                <select name="" id="" class="form-control" style="width: 100px" v-modle="region_Zone">
                     <option value="1">区域</option>
                     <option value="2">高温浸润区</option>
                     <option value="3">常温静置区</option>
                     <option value="4">高温老化区</option>                  
                 </select>
 
-                <select name="" id="" class="form-control" style="width: 100px">
-                    <option value="">设备编号</option>
-                    <option value="">SC01</option>
-                    <option value="">SC02</option>
-                    <option value="">SC03</option>
+                <select name="" id="" class="form-control" style="width: 100px" v-modle="region_SCNum">
+                    <option value="5">设备编号</option>
+                    <option value="SC01">SC01</option>
+                    <option value="SC02">SC02</option>
+                    <option value="SC03">SC03</option>
                 </select>
 
-                <select name="" id="" class="form-control" style="width: 100px">
-                    <option value="">工艺名称</option>
-                    <option value="">高温浸润</option>
-                    <option value="">高温老化</option>
-                    <option value="">一次常温静置</option>
-                    <option value="">二次常温静置</option>
-                    <option value="">化成</option>
+                <select name="" id="" class="form-control" style="width: 100px" v-modle="region_Gongyi">
+                    <option value="6">工艺名称</option>
+                    <option value="a">高温浸润</option>
+                    <option value="b">高温老化</option>
+                    <option value="c">一次常温静置</option>
+                    <option value="d">二次常温静置</option>
+                    <option value="e">化成</option>
                 </select>
-                <button class="btn btn-primary">切换</button>
+                <button class="btn btn-primary" @click="cutSelect">切换</button>
                 <section class=" panel panel-default info-modal " v-show="showModal" :style="{left:modalXY[0]+'px',top:modalXY[1]+'px'}">
                     <div class="panel-heading">货位信息</div>
                     <div class="panel-body ">

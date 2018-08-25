@@ -47,8 +47,7 @@ const goodsWatch = function(ws) {
         TechnologyName: '工艺名称',
         Sotredtime: '存储时间',
         FirstInTime: '入库时间',
-        LocationFlag: '货位标记',
-        SelectZone: '' //选择区域
+        LocationFlag: '货位标记'       
 
         //zonename: '区域名称', //区域名称
         //locationnumber: '货位编号', //货位编号
@@ -109,8 +108,8 @@ const goodsWatch = function(ws) {
             {
                 messagetype: 'getLocationDetail',
                 data: {
-                    locationnumber: e.locationnumber,
-                    zoneid: locationOther.zoneInfo
+                    locationnumber: e.locationnumber
+                    
                 }
             },
             function(res) {
@@ -246,7 +245,9 @@ const goodsWatch = function(ws) {
             showModal: false,
             modalXY: [0, 0],
             infoData: locationInfoData,
-            region: '' // 绑定的区域 数据 。界面上选择的哪个区域 就可以用这个取值
+            region_Zone: '',    //区域   绑定的区域 数据 。界面上选择的哪个区域 就可以用这个取值
+            region_SCNum: '',   //设备编号
+            region_Gongyi: ''   //工艺编号 
         },
         watch: {
             zoom(val) {
@@ -294,10 +295,25 @@ const goodsWatch = function(ws) {
                             nodeFlash(node, n - 1);
                         }, 300);
                     }
-
                     // 闪烁几下
                     nodeFlash(node, 6);
                 }
+            },
+            //点击切换按钮处理逻辑
+            cutSelect(){
+                console.log("我是货位监控切换数据："+ this.region_Zone);    
+                wsRequest(
+                    { 
+                        messagetype: 'getLocation',
+                        data: {
+                            ZoneName: this.region_Zone,   
+                            EquipmentNum: this.region_SCNum,   
+                            GongyiNum: this.region_Gongyi                
+                        }
+                    }, function(data) {
+                    isGet = true;
+                    createAll(data);
+                });
             }
         },
         filters: {
@@ -314,7 +330,7 @@ const goodsWatch = function(ws) {
 
     // 获取区域等信息
     wsRequest({ messagetype: 'getLocationCond' }, function(data) {
-        console.log('获取站台区域信息', data);
+        console.log('获取站台区域信息', region_Zone);
         //createAll(data);
     });
 
