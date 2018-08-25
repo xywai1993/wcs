@@ -398,6 +398,7 @@ const scadaConfig = function(ws) {
     wsRequest({ messagetype: 'getSystemConfig' }, function(data) {
         const dataArr = data.Data;
         createFn(dataArr);
+        console.log('收到配置的数据：', dataArr);
     });
     const createFn = dataArr => {
         dataArr.forEach((item, i) => {

@@ -82,7 +82,7 @@
                         <div class="info-modal-content">
                             <div style="width: 300px;">
                                 <h3>当前信息</h3>
-                                <ul class="modify-info">
+                                <ul class="modify-infoNow">
                                     <li v-for="(val,key) in copyEquipmentinfo">
                                         <span> {{key | en2zh}}:</span>
                                         <i>{{val | other2zh(key)}}</i>
@@ -126,11 +126,13 @@
                                                 <option value="12">消防任务（不启动灭火）</option>
                                                 <option value="13">消防任务（启动灭火）</option>
                                                 <option value="14">消防任务（避让）</option>
+                                                <option value="15">完成任务</option>
+                                                <option value="16">WCS模式切换（手自动）</option>
                                             </select>
                                         </li>
                                         <li>
                                             <span> 任务号:</span>
-                                            <input type="text" class="form-control" v-model="SRMInfo.taskNum">
+                                            <input type="text" class="form-control" v-model="SRMInfo.TaskNum">
                                         </li>
                                         <li>
                                             <span> 托盘条码:</span>
@@ -155,12 +157,15 @@
                                     <button class="btn btn-primary until-btn " v-for="item in stationButton" @click="actionButton(item)">{{item | button2zh}}</button>
                                 </div>
                                 <div v-show="stationData.DeviceType=='SRM'">
-                                    <button class="btn btn-primary until-btn" @click="sendSRMInfo">确认修改信息</button>
+                                    <button class="btn btn-primary until-btn" @click="sendSRMInfo">修改信息</button>
+                                </div>
+                                <div v-show="stationData.DeviceType=='SRM'">
+                                    <button class="btn btn-primary until-btn" @click="sendSRMInfo">其他按钮</button>
                                 </div>
                             </div>
                         </div>
                         <div class="info-modal-alert">
-                            <h5>设备报警</h5>
+                            <h5>异常信息</h5>
                             <div>{{stationData.Warm}}</div>
                             <div>
                                 <button @click="closeAudio" class="btn btn-primary">关闭报警音</button>
@@ -196,10 +201,10 @@
                 <button @click="find" class="btn btn-primary">查询</button>
                 <div style="height: 40px;border-right: 1px solid #eeeeee"></div>
                 <select name="" id="" class="form-control" style="width: 100px">
-                    <option value="">区域</option>
-                    <option value="">高温浸润区</option>
-                    <option value="">常温静置区</option>
-                    <option value="">高温老化区</option>
+                    <option value="1">区域</option>
+                    <option value="2">高温浸润区</option>
+                    <option value="3">常温静置区</option>
+                    <option value="4">高温老化区</option>                  
                 </select>
 
                 <select name="" id="" class="form-control" style="width: 100px">

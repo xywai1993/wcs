@@ -3,16 +3,18 @@
  */
 const deviceWatch = function(ws) {
     const BACEIMGURL = '../../Content/img/';
-    const GOODWIDTH = 14;
+    const GOODWIDTH = 7;  //货架宽度 原来是14
     const IMGURL = {
-        left: BACEIMGURL + 'left.png',
-        right: BACEIMGURL + 'right.png',
-        'left-right': BACEIMGURL + 'left-right.png',
-        top: BACEIMGURL + 'top.png',
-        bottom: BACEIMGURL + 'bottom.png',
+        left: BACEIMGURL + 'left.png',     //水平朝左方向
+        right: BACEIMGURL + 'right.png',   //水平朝右方向
+        'left-right': BACEIMGURL + 'left-right.png',    //水平双向
+        top: BACEIMGURL + 'top.png',                    //垂直朝上方向
+        bottom: BACEIMGURL + 'bottom.png',               //垂直朝下方向
         'top-bottom': BACEIMGURL + 'top-bottom.png',
 
-        loadSc: BACEIMGURL + 't_hcg.png',
+        loadSc: BACEIMGURL + 't_hcg.png',  //载货中
+        getBox:BACEIMGURL+'t_getBox.png',    //取货中
+        putBox:BACEIMGURL+'t_putBox.png',    //放货中
         sc: BACEIMGURL + 'sc.png',
         robot: BACEIMGURL + 'robot.png'
     };
@@ -45,11 +47,11 @@ const deviceWatch = function(ws) {
             //node.setSize(BACEWHPX, BACEWHPX);
             node.DeviceID = item.DeviceID;
             node.selected = false;
-            node.dragable = false;
+            node.dragable = 0;            
             node.textPosition = 'Middle_Center';
             node.DeviceType = item.DeviceType;
             node.setSize(50, 50);
-
+            node.fontColor = "255,255,0";         //字体颜色
             if (item.ShowStatus) {
                 node.fillColor = item.ShowStatus;
             } else {
@@ -63,13 +65,14 @@ const deviceWatch = function(ws) {
                     }
                 } else {
                     url = IMGURL['top-bottom'];
-                    if (item.Flow == 'T') {
+                    if (item.Flow == 'U') {
                         url = IMGURL.top;
-                    } else if (item.Flow == 'B') {
+                    } else if (item.Flow == 'D') {
                         url = IMGURL.bottom;
                     }
                 }
                 node.setImage(url);
+                
             }
             node.DeviceType = item.DeviceType;
             // node.setImage(0);
@@ -158,17 +161,32 @@ const deviceWatch = function(ws) {
             if (item.Status != 1) {
                 node.alarm = '设备报警';
                 openAudio();
-            } else {
+            } 
+            else 
+            {
                 node.alarm = null;
                 closeAudio();
             }
-
+            //Load状态为1是：载货行走，3：取货中，2：放货中,空或者为0：空堆垛机
             if (item.Load == 1) {
                 // node.setImage(0);
                 node.setImage(IMGURL.loadSc);
-            } else {
-                node.setImage(IMGURL.sc);
             }
+            else if(item.Load == 2)
+            {
+                node.setImage(IMGURL.putBox);
+            }
+            else if(item.Load == 3)
+            {
+                node.setImage(IMGURL.getBox);
+            }
+            else if(item.Load == 0)
+            {
+                    node.setImage(IMGURL.sc);              
+            }
+            else
+            node.setImage(IMGURL.sc);
+
         } else {
             const scene = stage.childs[0];
             var nodeRobot = new JTopo.Node(`${item.DeviceID}位于${item.Row}列`);
@@ -187,23 +205,69 @@ const deviceWatch = function(ws) {
             if (item.Status != 1) {
                 //alert('有设备报警，请及时处理');
                 nodeRobot.alarm = '设备报警';
+                console.log('堆垛机报警了啊:'+item.DeviceID);     
                 openAudio();
             } else {
                 nodeRobot.alarm = null;
             }
-            createGoods(37, item.Coordinate_X, item.Coordinate_Y, SRMWidth, SRMWidth);
+            //根据堆垛机编号画出列数，不同堆垛机有不同的列数   
+            console.log('堆垛机编号:'+item.DeviceID);      
+            /*if(item.DeviceID=='SC02')
+            {
+                var columnNum=20;               
+            }
+            else if(item.DeviceID=='SC03')
+            {
+                var columnNum=38;             
+            }
+            else if(item.DeviceID=='SC01')
+            {
+                var columnNum=8;
+            }*/
+            //g08列数
+            if(item.DeviceID=='SC03')
+            {
+                var columnNum=80;               
+            }
+            else if(item.DeviceID=='SC04')
+            {
+                var columnNum=80;             
+            }
+            else if(item.DeviceID=='SC05')
+            {
+                var columnNum=80;
+            }
+            else if(item.DeviceID=='SC06')
+            {
+                var columnNum=80;             
+            }
+            else if(item.DeviceID=='SC07')
+            {
+                var columnNum=80;
+            }
+            else if(item.DeviceID=='SC01')
+            {
+                var columnNum=80;             
+            }
+            else if(item.DeviceID=='SC02')
+            {
+                var columnNum=80;
+            }
+            createGoods(columnNum, item.Coordinate_X, item.Coordinate_Y, SRMWidth, SRMWidth);
             scene.add(nodeRobot);
         }
-
+        //根据堆垛机的位置画出货位列
         function createGoods(num, x, y, width, height) {
             new Array(num).fill(1).forEach((item, i) => {
-                const node = new JTopo.Node(i + 1 + '');
-                const node2 = new JTopo.Node(i + 1 + '');
+                //const node = new JTopo.Node(i + 1 + '');  //扩号里的参数列的数字  
+                //const node2 = new JTopo.Node(i + 1 + '');
+                const node = new JTopo.Node();  //扩号里的参数列的数字  
+                const node2 = new JTopo.Node();
                 const [w, h] = [GOODWIDTH, GOODWIDTH];
 
                 node.setSize(w, h);
                 node2.setSize(w, h);
-                node.setLocation(x + width + w * i, y - h);
+                node.setLocation(x + width+ w * i, y - h);
                 node.textPosition = 'Middle_Center';
                 node2.textPosition = 'Middle_Center';
                 node2.setLocation(x + width + w * i, y + height);
@@ -221,29 +285,125 @@ const deviceWatch = function(ws) {
     };
 
     /**
-     * 绘制机械手
+     * 绘制组盘机械手
      * @param {Object} item 绘制数据包
      * @param {Number} i   当前数量
      * @param {Object} stage 绘制舞台
      */
     const crawPutRobot = function(item, i, stage) {
-        console.log('我是机械手');
+        var cc = item.DeviceID;
         var scene = stage.childs[0];
-        const nodeRobot = new JTopo.Node(item.DeviceID);
-        nodeRobot.DeviceID = item.DeviceID;
-        nodeRobot.setSize(50, 50);
-        nodeRobot.DeviceType = item.DeviceType;
+        var nodes = scene.childs.filter(function(e) {
+            return e instanceof JTopo.Node;
+        });
+        nodes = nodes.filter(function(e) {
+            if (e.text == null) return false;
+            return e.text.indexOf(cc) != -1;
+        });
 
-        //nodeRobot.textPosition = 'Middle_Center';
-        console.log(item.Coordinate_X, item.Coordinate_Y);
+        // todo : 更新节点
+        if (nodes.length > 0) {
+            const node = nodes[0];
+            // todo  设备报警
+           if (item.Status != 0) {
+            //alert('有设备报警，请及时处理');
+              openAudio();
+              node.alarm = '组盘设备报警';
+           } else {
+            node.alarm = null;
+            closeAudio();
+           }
+        }
+        else{
+          console.log('我是组盘机械手');
+          var scene = stage.childs[0];
+          const nodeRobot = new JTopo.Node(item.DeviceID);
+          nodeRobot.DeviceID = item.DeviceID;
+          nodeRobot.setSize(100, 100);
+          nodeRobot.DeviceType = item.DeviceType;
 
-        nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
-        nodeRobot.shadow = false;
-        console.log(nodeRobot.getBound());
+          //nodeRobot.textPosition = 'Middle_Center';
+          console.log(item.Coordinate_X, item.Coordinate_Y);
 
-        nodeRobot.setImage(IMGURL.robot);
-        nodeRobot.dragable = false;
-        scene.add(nodeRobot);
+          nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
+          nodeRobot.shadow = false;
+          console.log(nodeRobot.getBound());
+
+          nodeRobot.setImage(IMGURL.robot);
+          nodeRobot.dragable = false;
+          scene.add(nodeRobot);
+        
+          // todo  设备报警
+          if (item.Status != 0) {
+              //alert('有设备报警，请及时处理');
+              openAudio();
+              nodeRobot.alarm = '组盘设备报警';
+          } else {
+              nodeRobot.alarm = null;
+              closeAudio();
+          }
+      }
+    };
+
+    /**
+     * 绘制拆盘机械手
+     * @param {Object} item 绘制数据包
+     * @param {Number} i   当前数量
+     * @param {Object} stage 绘制舞台
+     */
+    const crawPickRobot = function(item, i, stage) {
+        var cc = item.DeviceID;
+        var scene = stage.childs[0];
+        var nodes = scene.childs.filter(function(e) {
+            return e instanceof JTopo.Node;
+        });
+        nodes = nodes.filter(function(e) {
+            if (e.text == null) return false;
+            return e.text.indexOf(cc) != -1;
+        });
+
+        // todo : 更新节点
+        if (nodes.length > 0) {
+            const node = nodes[0];
+            // todo  设备报警
+           if (item.Status != 0) {
+            //alert('有设备报警，请及时处理');
+              openAudio();
+              node.alarm = '拆盘设备报警';
+           } else {
+            node.alarm = null;
+            closeAudio();
+           }
+        }
+        else{
+          console.log('我是拆盘机械手');
+          var scene = stage.childs[0];
+          const nodeRobot = new JTopo.Node(item.DeviceID);
+          nodeRobot.DeviceID = item.DeviceID;
+          nodeRobot.setSize(100, 100);
+          nodeRobot.DeviceType = item.DeviceType;
+
+          //nodeRobot.textPosition = 'Middle_Center';
+          console.log(item.Coordinate_X, item.Coordinate_Y);
+
+          nodeRobot.setLocation(item.Coordinate_X, item.Coordinate_Y);
+          nodeRobot.shadow = false;
+          console.log(nodeRobot.getBound());
+
+          nodeRobot.setImage(IMGURL.robot);
+          nodeRobot.dragable = false;
+          scene.add(nodeRobot);
+        
+          // todo  设备报警
+          if (item.Status != 0) {
+              //alert('有设备报警，请及时处理');
+              openAudio();
+              nodeRobot.alarm = '拆盘设备报警';
+          } else {
+              nodeRobot.alarm = null;
+              closeAudio();
+          }
+      }
     };
 
     /**
@@ -281,13 +441,14 @@ const deviceWatch = function(ws) {
 
     var scene = new JTopo.Scene(stage);
     stage.eagleEye.visible = true;
+    stage.wheelZoom = 1.2;  //设置鼠标滚轮滑动时的缩放比例
     scene.setBackground(BACEIMGURL + 'bg.jpg');
     // scene.alpha = 1;
     // scene.backgroundColor = '49,90,119'; //49,90,119
     setCanvasWH(canvas);
     //stage.mode = "select";  //可以框选多个节点、可以点击单个节点
 
-    let stationData = {}; // 单个站台信息
+    let stationData = {}; // 单个站台信息 let定义块级变量
     // 舞台单击事件
     stage.click(function(event) {
         if (event.button == 0) {
@@ -354,7 +515,7 @@ const deviceWatch = function(ws) {
             SRMInfo: {
                 LoadNum: '',
                 CommandType: '',
-                taskNum: '',
+                TaskNum: '',
                 BarCode: '',
                 SourceAddress: '',
                 TargetAddress: ''
@@ -492,9 +653,12 @@ const deviceWatch = function(ws) {
                     crawSRM(item, i, stage);
                     break;
                 case 'PutRobot':
-                case 'PickRobot':
-                    //绘制机械手
+                    //绘制组盘机械手
                     crawPutRobot(item, i, stage);
+                    break;                 
+                case 'PickRobot':
+                    //绘制拆盘机械手
+                    crawPickRobot(item, i, stage);
                     break;
                 default:
                     console.log('未知的DeviceType');

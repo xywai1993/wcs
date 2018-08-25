@@ -42,14 +42,27 @@ const goodsWatch = function(ws) {
     };
 
     const locationInfoData2zh = {
-        zonename: '区域名称', //区域名称
-        locationnumber: '货位编号', //货位编号
-        itemname: '物料名称', //物料名称
-        locationFlag: '货位标记', //货位标记
-        locationState: '货位状态', //货位状态
-        storeTime: '存储时间', //存储时间
-        technology: '工艺名称' //工艺名称
+        Locationnumber:'货位编号',
+        ItemName:'物料名称',
+        TechnologyName:'工艺名称',
+        Sotredtime:'存储时间',
+        FirstInTime:'入库时间',
+        LocationFlag:'货位标记',
+        SelectZone:''    //选择区域
+        
+        //zonename: '区域名称', //区域名称
+        //locationnumber: '货位编号', //货位编号
+        //itemname: '物料名称', //物料名称
+        //locationFlag: '货位标记', //货位标记
+        //locationState: '货位状态', //货位状态
+        //storeTime: '存储时间', //存储时间
+        //technology: '工艺名称' //工艺名称
     };
+
+    const locationOther={
+        SelectZone:'',  //界面选择的区域名称
+    };
+
     const goodsData = [
         ['001', '001', '001', '01'],
         ['001', '001', '003', '01'],
@@ -96,7 +109,8 @@ const goodsWatch = function(ws) {
             {
                 messagetype: 'getLocationDetail',
                 data: {
-                    locationnumber: e.locationnumber
+                    locationnumber: e.locationnumber,
+                    zoneid: locationOther.zoneInfo
                 }
             },
             function(res) {
@@ -160,14 +174,15 @@ const goodsWatch = function(ws) {
     const createAll = function(data) {
         data.Data.forEach(aa => {
             createGoods(
-                aa.locationdepth,
-                aa.locationcolumn,
-                aa.locationlayer,
-                aa.locationline,
-                aa.locationflag,
-                aa.locationnumber
+                aa.LocationDepth,
+                aa.LocationColumn,
+                aa.LocationLayer,
+                aa.LocationLine,
+                aa.LocationFlag,
+                aa.LocationNumber                                                          
             );
         });
+        //console.log('我是货位监控，啦啦啦啦啦啦啦啦啦啦啦：', data);
     };
 
     /**
@@ -230,7 +245,8 @@ const goodsWatch = function(ws) {
             keyword: '',
             showModal: false,
             modalXY: [0, 0],
-            infoData: locationInfoData
+            infoData: locationInfoData,
+            region:''
         },
         watch: {
             zoom(val) {

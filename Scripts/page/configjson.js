@@ -198,9 +198,31 @@ const GOODSTYPE = {
     },
     '4': {
         name: '异常托盘(4)'
+    },
+    '5': {
+        name: '尾盘(5)'
+    }
+    ,
+    '6': {
+        name: '待定盘(6)'
+    },
+    '7': {
+        name: '定位销定位中(7)'
+    },
+    '8': {
+        name: '装盘中(8)'
+    }
+    ,
+    '9': {
+        name: '拆盘中(9)'
+    }
+    ,
+    '10': {
+        name: 'OCV检测中(10)'
     }
 };
 
+//点击堆垛机以后前端向后台请求
 const EN2EH = {
     DeviceID: '站台号',
     TaskNum: '任务号',
@@ -214,10 +236,16 @@ const EN2EH = {
     b_I_State: '执行状态',
     b_I_TaskId1: '工位1任务号',
     b_I_TaskId2: '工位2任务号',
+    b_I_BarCode1: '工位1托盘号',
+    b_I_BarCode2: '工位2托盘号',
+    b_I_TaskStation1: '工位1任务地址',
+    b_I_TaskStation2: '工位2任务地址',
     b_I_TaskStatus1: '任务1状态',
     b_I_TaskStatus2: '任务2状态',
     IsInit: '是否初始化完成',
-    SendFlag: '是否允许下发'
+    SendFlag: '是否允许下发',
+    MissionMode:'WCS模式',
+    b_I_Auto:'手自动'
 };
 
 const STATIONS = {

@@ -1,4 +1,4 @@
-const SERVERURL = 'ws://192.16.9.108:9201';
+const SERVERURL = 'ws://192.16.9.2:9202';  //192.168.1.102
 const ws = new WebSocket(SERVERURL); //实例化WebSocket对象
 const wsMessageCallback = {};
 
@@ -63,7 +63,8 @@ ws.onmessage = function(e) {
     //var json = e.data;               //连接模拟服务端时启用
     const dataArr = json.Data;
     //console.log(dataArr);
-    console.log('数据来了:', json);
+    console.log('我是字符串数据:',e.data);
+    console.log('数据来了:',json);
     if (wsMessageCallback[json.MessageID]) {
         wsMessageCallback[json.MessageID](json);
         // ws.send({
